@@ -801,7 +801,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={formik.values.logo || "/images/logo.svg"}
+            src={"/images/logoblackwhite.jpeg"}
             alt="Logo"
             style={{
               width: "170px",
