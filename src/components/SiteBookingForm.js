@@ -5,6 +5,8 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 // Helper: safely extract a string message from any response shape
 const extractMessage = (data) => {
   if (!data) return "";
@@ -139,7 +141,7 @@ export function SiteBookingForm() {
         }
 
         const response = await axios.post(
-          "http://localhost:3001/site-booking",
+          `${API_BASE}/site-booking`,
           payload,
         );
 
@@ -204,7 +206,7 @@ export function SiteBookingForm() {
     setMemberFound(false);
 
     try {
-      const response = await axios.get("http://localhost:3001/members");
+      const response = await axios.get(`${API_BASE}/members`);
       const members = response.data.data || [];
 
       const member = members.find((m) => m.seniority_no === seniorityNo);

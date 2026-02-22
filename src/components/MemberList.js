@@ -2,6 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Header } from "./Header";
 
+
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 export function MemberList() {
   const isSuperAdmin = !!localStorage.getItem("superAdminToken");
 
@@ -20,7 +23,7 @@ export function MemberList() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/members")
+      .get(`${API_BASE}/members`)
       .then((response) => {
         SetMemberDetails(response.data.data || []);
       })
@@ -47,7 +50,7 @@ export function MemberList() {
   const handleSave = async () => {
     try {
       await axios.put(
-        `http://localhost:3001/members/${selectedMember._id}`,
+        `${API_BASE}/members/${selectedMember._id}`,
         editData,
         {
           headers: {

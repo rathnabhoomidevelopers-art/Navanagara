@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Header } from "./Header";
 import { generateReceiptPDF } from "../utils/generateReceiptPDF";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 export function ReceiptList() {
   const isSuperAdmin = !!localStorage.getItem("superAdminToken");
   const headers = [
@@ -37,7 +39,7 @@ export function ReceiptList() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/receipts")
+      .get(`${API_BASE}/receipts`)
       .then((response) => {
         SetMemberDetails(response.data.data || []);
         setFilteredMembers(response.data.data || []);
@@ -79,7 +81,7 @@ export function ReceiptList() {
   const handleSave = async () => {
     try {
       await axios.put(
-        `http://localhost:3001/receipts/${selectedMember._id}`,
+        `${API_BASE}/receipts/${selectedMember._id}`,
         editData,
         {
           headers: {

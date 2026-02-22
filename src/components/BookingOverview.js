@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import * as Recharts from "recharts";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 export default function BookingOverview() {
   const [chartData, setChartData] = useState([]);
   const [totalBookings, setTotalBookings] = useState(0);
@@ -28,7 +30,7 @@ export default function BookingOverview() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/sitebookings")
+      .get(`${API_BASE}/sitebookings`)
       .then((res) => {
         const bookings = res.data || [];
         setTotalBookings(bookings.length);

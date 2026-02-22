@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Header } from "./Header";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 export default function Payments() {
   const [tableData, setTableData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +23,7 @@ export default function Payments() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/receipts")
+      .get(`${API_BASE}/receipts`)
       .then((res) => setTableData(res.data.data || []))
       .catch((err) => console.error("Unable to fetch receipts:", err));
   }, []);
