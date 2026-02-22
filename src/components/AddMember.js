@@ -5,6 +5,13 @@ import axios from "axios";
 import { Header } from "./Header";
 import { toast } from "react-toastify";
 
+const MEMBERSHIP_FEES = 2500;
+
+const membershipTypes = [
+  { label: "Associate Member", value: "Associate Member" },
+  { label: "Permanent Member", value: "Permanent Member" },
+];
+
 const AddMember = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormCompleted, setIsFormCompleted] = useState(false);
@@ -15,7 +22,6 @@ const AddMember = () => {
   const projects = [
     { name: "New City", code: "NCG" },
     { name: "New City 1", code: "NCS" },
-    // Add more projects as needed
   ];
 
   // Formik for Step 1 - Membership Details
@@ -70,6 +76,15 @@ const AddMember = () => {
       setCurrentStep(2);
     },
   });
+
+  // Auto-fill MembershipFees when MembershipType is selected
+  useEffect(() => {
+    if (formikStep1.values.MembershipType) {
+      formikStep1.setFieldValue("MembershipFees", MEMBERSHIP_FEES);
+    } else {
+      formikStep1.setFieldValue("MembershipFees", "");
+    }
+  }, [formikStep1.values.MembershipType]);
 
   // Update the full seniority number when project or seniority input changes
   useEffect(() => {
@@ -235,11 +250,9 @@ const AddMember = () => {
 
       try {
         const formData = new FormData();
-        // Append all text fields
         Object.entries(finalData).forEach(([key, value]) => {
           formData.append(key, value);
         });
-        // Append files if provided
         if (formikStep1.values.Image) {
           formData.append("Image", formikStep1.values.Image);
         }
@@ -253,9 +266,8 @@ const AddMember = () => {
           formData.append("ApplicationDoc", formikStep2.values.ApplicationDoc);
         }
 
-        // TO
         const response = await axios.post(
-          `${process.env.REACT_APP_API_BASE}/add-members`,
+          "http://localhost:3001/add-members",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -297,7 +309,6 @@ const AddMember = () => {
     if (file) formikStep2.setFieldValue(fieldName, file);
   };
 
-  // Reusable file upload field component
   const FileUploadField = ({
     label,
     fieldName,
@@ -504,7 +515,11 @@ const AddMember = () => {
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   >
                     <option value="">Select Membership Type</option>
-                    <option value="Membership">Membership</option>
+                    {membershipTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
                   </select>
                   {formikStep1.touched.MembershipType &&
                     formikStep1.errors.MembershipType && (
@@ -557,20 +572,34 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Membership Fees */}
+                {/* Membership Fees — auto-filled, read-only */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Membership Fees <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="number"
-                    name="MembershipFees"
-                    onChange={formikStep1.handleChange}
-                    onBlur={formikStep1.handleBlur}
-                    value={formikStep1.values.MembershipFees}
-                    placeholder="5000"
-                    className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="MembershipFees"
+                      value={formikStep1.values.MembershipFees}
+                      readOnly
+                      placeholder="Auto-filled on type selection"
+                      className="border border-gray-300 px-4 py-2.5 w-full bg-gray-50 text-gray-700 focus:outline-none rounded text-sm cursor-not-allowed"
+                    />
+                    {formikStep1.values.MembershipFees && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-xs font-semibold">
+                        ₹
+                        {Number(
+                          formikStep1.values.MembershipFees,
+                        ).toLocaleString("en-IN")}
+                      </span>
+                    )}
+                  </div>
+                  {!formikStep1.values.MembershipType && (
+                    <p className="text-gray-400 text-xs mt-1">
+                      Select a membership type to auto-fill fees
+                    </p>
+                  )}
                   {formikStep1.touched.MembershipFees &&
                     formikStep1.errors.MembershipFees && (
                       <div className="text-red-500 text-xs mt-1">
@@ -863,25 +892,18 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* ── NEW DOCUMENT UPLOAD FIELDS ── */}
-
-                {/* PAN Card Upload */}
                 <FileUploadField
                   label="PAN Card"
                   fieldName="PanCard"
                   accept="image/*,.pdf"
                   formik={formikStep2}
                 />
-
-                {/* Aadhar Card Upload */}
                 <FileUploadField
                   label="Aadhar Card"
                   fieldName="AadharCard"
                   accept="image/*,.pdf"
                   formik={formikStep2}
                 />
-
-                {/* Application Upload - full width */}
                 <div className="w-100">
                   <FileUploadField
                     label="Application Document"
@@ -917,7 +939,6 @@ const AddMember = () => {
               className="bg-[#FAF9FF] rounded-xl p-[30px]"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                {/* Nominee Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nominee Name <span className="text-red-500">*</span>
@@ -939,7 +960,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Nominee Mobile Number */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nominee Mobile Number{" "}
@@ -962,7 +982,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Nominee Age */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nominee Age <span className="text-red-500">*</span>
@@ -984,7 +1003,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Nominee Relationship */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nominee Relationship <span className="text-red-500">*</span>
@@ -1006,7 +1024,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Nominee Address */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nominee Address <span className="text-red-500">*</span>
@@ -1028,7 +1045,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Terms and Conditions */}
                 <div className="md:col-span-2">
                   <label className="flex items-center space-x-2">
                     <input
@@ -1052,7 +1068,6 @@ const AddMember = () => {
                     )}
                 </div>
 
-                {/* Communication */}
                 <div className="md:col-span-2">
                   <label className="flex items-center space-x-2">
                     <input
