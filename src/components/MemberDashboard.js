@@ -93,6 +93,7 @@ export function MemberDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex justify-between items-center px-10 py-[18px] shadow-sm bg-white">
+        <img src="/images/logo.svg"/>
         <div className="font-semibold text-[30px] text-[#7C66CA]">
           Welcome, Navanagara
         </div>
