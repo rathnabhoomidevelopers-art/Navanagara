@@ -179,7 +179,7 @@ export function SiteBookingList() {
 
   const handleViewMemberDetails = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/members");
+      const response = await axios.get(`${API_BASE}/members`);
       const members = response.data.data || [];
       const memberData = members.find(
         (member) => member.seniority_no === selectedMember.seniority_no,
@@ -233,7 +233,7 @@ export function SiteBookingList() {
       localStorage.getItem("adminToken");
 
     try {
-      await axios.post("http://localhost:3001/sitebooking/cancel", formData, {
+      await axios.post(`${API_BASE}/sitebooking/cancel`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

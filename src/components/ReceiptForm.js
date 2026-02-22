@@ -836,7 +836,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={"/images/logoblack.jpeg"}
+            src={"/images/logoblackwhite.jpeg"}
             alt="Logo"
             style={{
               width: "150px",
