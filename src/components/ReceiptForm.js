@@ -5,6 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Header } from "./Header";
 
+
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 // Project types with their shortforms
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
@@ -205,14 +207,14 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     setIsCheckingMember(true);
 
     try {
-      const membersResponse = await axios.get("http://localhost:3001/members");
+      const membersResponse = await axios.get(`${API_BASE}/members`);
       const members = membersResponse.data.data || [];
       const memberFound = members.find(
         (m) => m.seniority_no === seniorityNumber,
       );
 
       const sitebookingsResponse = await axios.get(
-        "http://localhost:3001/sitebookings",
+        `${API_BASE}/sitebookings`,
       );
       const sitebookings = sitebookingsResponse.data || [];
       const siteBookingFound = sitebookings.find(
@@ -264,7 +266,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         }
 
         const receiptsResponse = await axios.get(
-          "http://localhost:3001/receipts",
+          `${API_BASE}/receipts`,
         );
         const receipts = receiptsResponse.data.data || [];
         const existingReceipt = receipts.find(
@@ -668,7 +670,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           };
 
           const response = await axios.post(
-            "http://localhost:3001/receipt",
+            `${API_BASE}/receipt`,
             receiptPayload,
           );
           if (response.data.success) {

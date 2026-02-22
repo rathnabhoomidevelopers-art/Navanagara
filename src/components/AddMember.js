@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 
 const MEMBERSHIP_FEES = 2500;
 
+const API_BASE =
+  process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 const membershipTypes = [
   { label: "Associate Member", value: "Associate Member" },
   { label: "Permanent Member", value: "Permanent Member" },
@@ -267,7 +270,7 @@ const AddMember = () => {
         }
 
         const response = await axios.post(
-          "http://localhost:3001/add-members",
+          `${API_BASE}/add-members`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );

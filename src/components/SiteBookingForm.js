@@ -5,6 +5,8 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 const extractMessage = (data) => {
   if (!data) return "";
   if (typeof data === "string") return data;
@@ -105,7 +107,7 @@ export function SiteBookingForm() {
         };
 
         const response = await axios.post(
-          "http://localhost:3001/site-booking",
+          `${API_BASE}/site-booking`,
           payload,
         );
         setSubmitMessage(
@@ -160,7 +162,7 @@ export function SiteBookingForm() {
     setIsFetchingMember(true);
     setMemberFound(false);
     try {
-      const response = await axios.get("http://localhost:3001/members");
+      const response = await axios.get(`${API_BASE}/members`);
       const members = response.data.data || [];
       const member = members.find((m) => m.seniority_no === seniorityNo);
       if (member) {

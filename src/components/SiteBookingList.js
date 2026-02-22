@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Header } from "./Header";
 import { toast } from "react-toastify";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 export function SiteBookingList() {
   const isSuperAdmin = !!localStorage.getItem("superAdminToken");
   const isAdmin = !!localStorage.getItem("adminToken");
@@ -34,7 +36,7 @@ export function SiteBookingList() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/sitebookings")
+      .get(`${API_BASE}/sitebookings`)
       .then((response) => {
         SetMemberDetails(response.data || []);
         setFilteredMembers(response.data || []);
@@ -71,7 +73,7 @@ export function SiteBookingList() {
       const token =
         localStorage.getItem("superAdminToken") ||
         localStorage.getItem("adminToken");
-      const res = await axios.get("http://localhost:3001/receipts", {
+      const res = await axios.get(`${API_BASE}/receipts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const allReceipts = res.data?.data || [];
@@ -143,7 +145,7 @@ export function SiteBookingList() {
 
     try {
       const response = await axios.put(
-        `http://localhost:3001/sitebookings/${selectedMember._id}`,
+        `${API_BASE}/sitebookings/${selectedMember._id}`,
         payload,
         {
           headers: {
