@@ -10,7 +10,7 @@ export function SiteBookingList() {
   const isAdmin = !!localStorage.getItem("adminToken");
   const canCancel = isSuperAdmin || isAdmin;
 
-  const headers = ["Date", "Member Name", "Seniority No.", "Project Name", "Actions"];
+  const headers = ["Date", "Member Name", "Seniority No.", "Project Name", ""];
   const [Memberdetails, SetMemberDetails] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -213,14 +213,21 @@ export function SiteBookingList() {
     setMemberDetailsData(null);
   };
 
+  const MEMBERSHIP_FEE = 2500;
+
   const calculatePaymentSummary = (member) => {
     const totalAmount = parseFloat(member.totalamount) || 0;
-    const paidAmount = memberReceipts.reduce(
+    const totalPaid = memberReceipts.reduce(
       (sum, r) => sum + (parseFloat(r.amountpaid) || 0),
       0,
     );
-    const remainingAmount = totalAmount - paidAmount;
-    return { totalAmount, paidAmount, remainingAmount };
+    // New user = their FIRST receipt has is_new_user === true (set by backend at creation)
+    const isNewUser = memberReceipts.some((r) => r.is_new_user === true);
+    // Membership fee is separate — only the site payment counts toward totalAmount
+    const membershipFee = isNewUser ? MEMBERSHIP_FEE : 0;
+    const paidAmount = totalPaid - membershipFee;   // site payment only e.g. 102500 - 2500 = 100000
+    const remainingAmount = totalAmount - paidAmount; // 500000 - 100000 = 400000
+    return { totalAmount, paidAmount, remainingAmount, isNewUser };
   };
 
   const handleCancelClick = (member) => {
@@ -362,7 +369,7 @@ export function SiteBookingList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-center text-white font-semibold text-[20px] tracking-wide"
+                    className="px-6 py-4 text-start text-white font-semibold text-base tracking-wide"
                   >
                     {header}
                   </th>
@@ -373,7 +380,7 @@ export function SiteBookingList() {
               {filteredMembers.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={`border-b border-gray-200 text-center text-[14px] transition-colors duration-200 ${
+                  className={`border-b border-gray-200 text-start text-[14px] transition-colors duration-200 ${
                     member.cancelled ? "bg-red-50" : "hover:bg-purple-50"
                   }`}
                 >
@@ -656,7 +663,7 @@ export function SiteBookingList() {
 
                     {/* Payment Summary */}
                     {(() => {
-                      const { totalAmount, paidAmount, remainingAmount } =
+                      const { totalAmount, paidAmount, remainingAmount, isNewUser } =
                         calculatePaymentSummary(selectedMember);
                       return (
                         <>
@@ -670,6 +677,19 @@ export function SiteBookingList() {
                                 : `₹${paidAmount.toLocaleString("en-IN")}`}
                             </dd>
                           </div>
+                          {!isFetchingReceipts && isNewUser && (
+                            <div className="border-b border-gray-200 pb-4">
+                              <dt className="inline font-semibold">
+                                Membership Fee:{" "}
+                              </dt>
+                              <dd className="inline font-semibold text-blue-600">
+                                ₹{MEMBERSHIP_FEE.toLocaleString("en-IN")}
+                              </dd>
+                              <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                                New Member
+                              </span>
+                            </div>
+                          )}
                           <div className="border-b border-gray-200 pb-4">
                             <dt className="inline font-semibold">
                               Remaining Amount:{" "}

@@ -13,7 +13,7 @@ export function ReceiptList() {
     "Transaction ID",
     "Name",
     "Amount",
-    "Actions",
+    "",
   ];
   const [Memberdetails, SetMemberDetails] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
@@ -202,7 +202,7 @@ export function ReceiptList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-center text-white font-semibold text-[20px] tracking-wide"
+                    className="px-6 py-4 text-start text-white font-semibold text-base tracking-wide"
                   >
                     {header}
                   </th>
@@ -213,7 +213,7 @@ export function ReceiptList() {
               {filteredMembers.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={`border-b border-gray-200 text-center text-[14px] transition-colors duration-200 ${member.cancelled ? "bg-red-50" : "hover:bg-purple-50"}`}
+                  className={`border-b border-gray-200 text-start text-[14px] transition-colors duration-200 ${member.cancelled ? "bg-red-50" : "hover:bg-purple-50"}`}
                 >
                   <td className="px-6 py-4 text-gray-700 font-medium">
                     {member.date
@@ -469,10 +469,35 @@ export function ReceiptList() {
                     "paymenttype",
                     selectedMember.paymenttype,
                   )}
-                  {editField(
-                    "Paid Amount",
-                    "amountpaid",
-                    selectedMember.amountpaid,
+                  {/* Paid Amount — split membership fee for new users */}
+                  <div className="border-b border-gray-200 pb-4">
+                    <dt className="inline font-semibold">Paid Amount: </dt>
+                    {isEditing && !selectedMember?.cancelled ? (
+                      <input
+                        name="amountpaid"
+                        value={editData.amountpaid || ""}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 rounded px-2 py-1 text-sm ml-1"
+                      />
+                    ) : (
+                      <dd className="inline font-normal">
+                        ₹{(
+                          selectedMember.is_new_user
+                            ? (parseFloat(selectedMember.amountpaid) || 0) - 2500
+                            : (parseFloat(selectedMember.amountpaid) || 0)
+                        ).toLocaleString("en-IN")}
+                      </dd>
+                    )}
+                  </div>
+                  {/* Membership Fee — only for new users */}
+                  {selectedMember.is_new_user && (
+                    <div className="border-b border-gray-200 pb-4">
+                      <dt className="inline font-semibold">Membership Fee: </dt>
+                      <dd className="inline font-semibold text-blue-600 ml-1">₹2,500</dd>
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                        New Member
+                      </span>
+                    </div>
                   )}
                   {editField(
                     "Payment Mode",
