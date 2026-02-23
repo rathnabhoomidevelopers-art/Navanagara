@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Header } from "./Header";
 
-
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 
 export function MemberList() {
@@ -13,7 +12,7 @@ export function MemberList() {
     "Member Name",
     "Seniority No",
     "Membership Type",
-    "Actions",
+    "",
   ];
   const [Memberdetails, SetMemberDetails] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -100,7 +99,7 @@ export function MemberList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-center text-white font-semibold text-[20px] tracking-wide"
+                    className="px-6 py-4 text-start text-white font-semibold text-base tracking-wide"
                   >
                     {header}
                   </th>
@@ -111,7 +110,7 @@ export function MemberList() {
               {Memberdetails.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-gray-200 text-center text-[14px] hover:bg-purple-50 transition-colors duration-200"
+                  className="border-b border-gray-200 text-start text-[14px] hover:bg-purple-50 transition-colors duration-200"
                 >
                   <td className="px-6 py-4 text-gray-700 font-medium">
                     {member.date
@@ -378,6 +377,119 @@ export function MemberList() {
                     )}
                   </div>
                 </dl>
+
+                {/* Documents Section */}
+                {(selectedMember.aadharcard || selectedMember.pancard || selectedMember.applicationdoc) && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h3 className="text-[16px] font-semibold text-gray-800 mb-4">
+                      📄 Uploaded Documents
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* Aadhar Card */}
+                      {selectedMember.aadharcard ? (
+                        <a
+                          href={selectedMember.aadharcard}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-[#8356D6] rounded-xl hover:bg-purple-50 transition-colors group"
+                        >
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                            <svg className="w-5 h-5 text-[#8356D6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-[#8356D6] text-center">Aadhar Card</span>
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download
+                          </span>
+                        </a>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-xl opacity-50">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-400 text-center">Aadhar Card</span>
+                          <span className="text-xs text-gray-300">Not uploaded</span>
+                        </div>
+                      )}
+
+                      {/* PAN Card */}
+                      {selectedMember.pancard ? (
+                        <a
+                          href={selectedMember.pancard}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-[#8356D6] rounded-xl hover:bg-purple-50 transition-colors group"
+                        >
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                            <svg className="w-5 h-5 text-[#8356D6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-[#8356D6] text-center">PAN Card</span>
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download
+                          </span>
+                        </a>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-xl opacity-50">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-400 text-center">PAN Card</span>
+                          <span className="text-xs text-gray-300">Not uploaded</span>
+                        </div>
+                      )}
+
+                      {/* Application PDF */}
+                      {selectedMember.applicationdoc ? (
+                        <a
+                          href={selectedMember.applicationdoc}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-[#8356D6] rounded-xl hover:bg-purple-50 transition-colors group"
+                        >
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                            <svg className="w-5 h-5 text-[#8356D6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-[#8356D6] text-center">Application PDF</span>
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download
+                          </span>
+                        </a>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-xl opacity-50">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-400 text-center">Application PDF</span>
+                          <span className="text-xs text-gray-300">Not uploaded</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
               </div>
             </div>
           </div>
