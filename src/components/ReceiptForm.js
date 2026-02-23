@@ -1304,7 +1304,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.receiptNo}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="e.g., RCP/2024/001"
+                    placeholder="Enter Receipt No."
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.receiptNo && formik.errors.receiptNo
                         ? "border-red-500 focus:ring-red-500"
@@ -1355,7 +1355,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       type="text"
                       value={seniorityInput}
                       onChange={handleSeniorityInputChange}
-                      placeholder="001"
+                      placeholder="Enter Seniority No."
                       maxLength={3}
                       className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                         formik.touched.seniorityNumber &&
@@ -1420,7 +1420,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.receivedFrom}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Auto-filled from database"
+                    placeholder="Enter Member Name"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.receivedFrom && formik.errors.receivedFrom
                         ? "border-red-500 focus:ring-red-500"
@@ -1518,7 +1518,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.siteDimension}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="e.g., 30x40"
+                    placeholder="Enter Site Dimension"
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -1596,7 +1596,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.phoneNumber}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Auto-filled from database"
+                    placeholder="Enter Mobile No."
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.phoneNumber && formik.errors.phoneNumber
                         ? "border-red-500 focus:ring-red-500"
@@ -1621,7 +1621,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.Email}
-                    placeholder="Auto-filled from database"
+                    placeholder="Enter Member Email"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.Email && formik.errors.Email
                         ? "border-red-500 focus:ring-red-500"

@@ -440,7 +440,7 @@ const AddMember = () => {
                     onChange={formikStep1.handleChange}
                     onBlur={formikStep1.handleBlur}
                     value={formikStep1.values.Name}
-                    placeholder="Varun"
+                    placeholder="Enter member name"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep1.touched.Name && formikStep1.errors.Name && (
@@ -484,7 +484,7 @@ const AddMember = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter number (e.g., 001)"
+                    placeholder="Enter Seniority No. (e.g., 001)"
                     value={seniorityInput}
                     onChange={handleSeniorityInputChange}
                     onBlur={formikStep1.handleBlur}
@@ -543,7 +543,7 @@ const AddMember = () => {
                     onChange={formikStep1.handleChange}
                     onBlur={formikStep1.handleBlur}
                     value={formikStep1.values.ApplicationNumber}
-                    placeholder="APP123456"
+                    placeholder="Enter Application No."
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep1.touched.ApplicationNumber &&
@@ -622,7 +622,7 @@ const AddMember = () => {
                     onChange={formikStep1.handleChange}
                     onBlur={formikStep1.handleBlur}
                     value={formikStep1.values.MobileNumber}
-                    placeholder="9876543210"
+                    placeholder="Enter Mobile No."
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep1.touched.MobileNumber &&
@@ -644,7 +644,7 @@ const AddMember = () => {
                     onChange={formikStep1.handleChange}
                     onBlur={formikStep1.handleBlur}
                     value={formikStep1.values.Email}
-                    placeholder="varun@example.com"
+                    placeholder="Enter Member Email"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep1.touched.Email && formikStep1.errors.Email && (
@@ -730,7 +730,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.AadharNumber}
-                    placeholder="1234 5678 9012"
+                    placeholder="Enter Aadhar No."
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.AadharNumber &&
@@ -772,7 +772,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.FatherName}
-                    placeholder="Rajesh Kumar"
+                    placeholder="Enter Spouse Name"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.FatherName &&
@@ -794,7 +794,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.BirthPlace}
-                    placeholder="Chennai"
+                    placeholder="Enter Birth Place"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.BirthPlace &&
@@ -817,7 +817,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.AlternateMobileNumber}
-                    placeholder="9876543210"
+                    placeholder="Enter Alternate Mobile No."
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.AlternateMobileNumber &&
@@ -839,7 +839,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.AlternateEmail}
-                    placeholder="alternate@example.com"
+                    placeholder="Enter Alternate Email"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.AlternateEmail &&
@@ -861,7 +861,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.PermanentAddress}
-                    placeholder="Tamilnadu"
+                    placeholder="Enter Permanent Address"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.PermanentAddress &&
@@ -884,7 +884,7 @@ const AddMember = () => {
                     onChange={formikStep2.handleChange}
                     onBlur={formikStep2.handleBlur}
                     value={formikStep2.values.CorrespondenceAddress}
-                    placeholder="Bangalore"
+                    placeholder="Enter Correspondence Address"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep2.touched.CorrespondenceAddress &&
@@ -952,7 +952,7 @@ const AddMember = () => {
                     onChange={formikStep3.handleChange}
                     onBlur={formikStep3.handleBlur}
                     value={formikStep3.values.NomineeName}
-                    placeholder="Varun"
+                    placeholder="Enter Nominee Name"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep3.touched.NomineeName &&
@@ -974,7 +974,7 @@ const AddMember = () => {
                     onChange={formikStep3.handleChange}
                     onBlur={formikStep3.handleBlur}
                     value={formikStep3.values.NomineeMobileNumber}
-                    placeholder="8527419630"
+                    placeholder="Enter Nominee Mobile No."
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep3.touched.NomineeMobileNumber &&
@@ -995,7 +995,7 @@ const AddMember = () => {
                     onChange={formikStep3.handleChange}
                     onBlur={formikStep3.handleBlur}
                     value={formikStep3.values.NomineeAge}
-                    placeholder="35"
+                    placeholder="Enter Nominee Age"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep3.touched.NomineeAge &&
@@ -1016,7 +1016,7 @@ const AddMember = () => {
                     onChange={formikStep3.handleChange}
                     onBlur={formikStep3.handleBlur}
                     value={formikStep3.values.NomineeRelationship}
-                    placeholder="Brother"
+                    placeholder="Enter Nominee Relation"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep3.touched.NomineeRelationship &&
@@ -1037,7 +1037,7 @@ const AddMember = () => {
                     onChange={formikStep3.handleChange}
                     onBlur={formikStep3.handleBlur}
                     value={formikStep3.values.NomineeAddress}
-                    placeholder="Tamilnadu"
+                    placeholder="Enter Nominee Address"
                     className="border border-gray-300 px-4 py-2.5 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent rounded text-sm"
                   />
                   {formikStep3.touched.NomineeAddress &&
