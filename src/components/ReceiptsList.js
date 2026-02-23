@@ -23,6 +23,7 @@ export function ReceiptList() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [downloadingId, setDownloadingId] = useState(null);
+  const [memberImage, setMemberImage] = useState(null);
 
   // Download receipt PDF — same format as ReceiptForm
   const handleDownloadReceipt = async (receipt) => {
@@ -61,17 +62,29 @@ export function ReceiptList() {
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
   const clearSearch = () => setSearchQuery("");
 
-  const handleViewDetails = (member) => {
+  const handleViewDetails = async (member) => {
     setSelectedMember(member);
     setEditData(member);
     setIsModalOpen(true);
     setIsEditing(false);
+    setMemberImage(null);
+
+    // Fetch member profile image using seniority_no
+    try {
+      const res = await axios.get(`${API_BASE}/members`);
+      const members = res.data.data || [];
+      const found = members.find((m) => m.seniority_no === member.seniority_no);
+      if (found?.image) setMemberImage(found.image);
+    } catch (err) {
+      console.error("Error fetching member image:", err);
+    }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedMember(null);
     setIsEditing(false);
+    setMemberImage(null);
   };
 
   const handleEditChange = (e) => {
@@ -189,7 +202,7 @@ export function ReceiptList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-center text-white font-semibold text-base tracking-wide"
+                    className="px-6 py-4 text-center text-white font-semibold text-[20px] tracking-wide"
                   >
                     {header}
                   </th>
@@ -200,7 +213,7 @@ export function ReceiptList() {
               {filteredMembers.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={`border-b border-gray-200 text-start text-[14px] transition-colors duration-200 ${member.cancelled ? "bg-red-50" : "hover:bg-purple-50"}`}
+                  className={`border-b border-gray-200 text-center text-[14px] transition-colors duration-200 ${member.cancelled ? "bg-red-50" : "hover:bg-purple-50"}`}
                 >
                   <td className="px-6 py-4 text-gray-700 font-medium">
                     {member.date
@@ -310,14 +323,12 @@ export function ReceiptList() {
               </button>
 
               <div className="flex items-center gap-3">
-                {/* Cancelled badge in modal */}
                 {selectedMember.cancelled && (
                   <span className="bg-red-100 text-red-600 text-sm font-semibold px-4 py-2 rounded-full border border-red-300">
                     ✕ Cancelled
                   </span>
                 )}
 
-                {/* Edit buttons only if NOT cancelled and superadmin */}
                 {isSuperAdmin && !selectedMember.cancelled && (
                   <div className="flex gap-2">
                     {isEditing ? (
@@ -355,14 +366,11 @@ export function ReceiptList() {
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-semibold">Receipt Details</h2>
-                    {/* {selectedMember.cancelled && (
-                      <span className="bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">Cancelled</span>
-                    )} */}
                   </div>
                   <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-                    {selectedMember.image ? (
+                    {memberImage ? (
                       <img
-                        src={selectedMember.image}
+                        src={memberImage}
                         alt="Member"
                         className="w-full h-full object-cover"
                       />

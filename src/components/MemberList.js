@@ -111,7 +111,7 @@ export function MemberList() {
               {Memberdetails.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-gray-200 text-start text-[14px] hover:bg-purple-50 transition-colors duration-200"
+                  className="border-b border-gray-200 text-center text-[14px] hover:bg-purple-50 transition-colors duration-200"
                 >
                   <td className="px-6 py-4 text-gray-700 font-medium">
                     {member.date

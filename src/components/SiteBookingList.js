@@ -28,6 +28,9 @@ export function SiteBookingList() {
   const [memberReceipts, setMemberReceipts] = useState([]);
   const [isFetchingReceipts, setIsFetchingReceipts] = useState(false);
 
+  // Profile image fetched by seniority_no
+  const [memberImage, setMemberImage] = useState(null);
+
   // Project → Seniority prefix map
   const projectPrefixMap = {
     "New City 1": "NCS",
@@ -66,6 +69,17 @@ export function SiteBookingList() {
     setMemberDetailsData(null);
     setIsEditing(false);
     setMemberReceipts([]);
+    setMemberImage(null);
+
+    // Fetch member profile image by seniority_no
+    axios
+      .get(`${API_BASE}/members`)
+      .then((res) => {
+        const members = res.data.data || [];
+        const found = members.find((m) => m.seniority_no === member.seniority_no);
+        if (found?.image) setMemberImage(found.image);
+      })
+      .catch((err) => console.error("Error fetching member image:", err));
 
     // Fetch receipts for this member's seniority_no
     setIsFetchingReceipts(true);
@@ -95,6 +109,7 @@ export function SiteBookingList() {
     setMemberDetailsData(null);
     setIsEditing(false);
     setMemberReceipts([]);
+    setMemberImage(null);
   };
 
   const handleEditChange = (e) => {
@@ -130,8 +145,6 @@ export function SiteBookingList() {
       localStorage.getItem("superAdminToken") ||
       localStorage.getItem("adminToken");
 
-    // Send only the editable fields — avoids sending Mongoose internals
-    // Bank field removed
     const payload = {
       seniority_no: editData.seniority_no,
       name: editData.name,
@@ -360,7 +373,7 @@ export function SiteBookingList() {
               {filteredMembers.map((member, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={`border-b border-gray-200 text-start text-[14px] transition-colors duration-200 ${
+                  className={`border-b border-gray-200 text-center text-[14px] transition-colors duration-200 ${
                     member.cancelled ? "bg-red-50" : "hover:bg-purple-50"
                   }`}
                 >
@@ -505,9 +518,9 @@ export function SiteBookingList() {
                       Site Booking Details
                     </h2>
                     <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-                      {selectedMember.image ? (
+                      {memberImage ? (
                         <img
-                          src={selectedMember.image}
+                          src={memberImage}
                           alt="Member"
                           className="w-full h-full object-cover"
                         />
@@ -634,7 +647,6 @@ export function SiteBookingList() {
                       "totalamount",
                       selectedMember.totalamount,
                     )}
-                    {/* Designation shown only if present (optional field) */}
                     {(selectedMember.designation || isEditing) &&
                       editField(
                         "Designation",
