@@ -13,7 +13,7 @@ export function MemberList() {
     "Member Name",
     "Seniority No",
     "Membership Type",
-    "",
+    "Actions",
   ];
   const [Memberdetails, SetMemberDetails] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -100,7 +100,7 @@ export function MemberList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-start text-white font-semibold text-base tracking-wide"
+                    className="px-6 py-4 text-start text-white font-semibold text-[20px] tracking-wide"
                   >
                     {header}
                   </th>

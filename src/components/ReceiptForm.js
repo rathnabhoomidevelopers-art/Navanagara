@@ -5,8 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Header } from "./Header";
 
-
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 // Project types with their shortforms
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
@@ -78,6 +78,10 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
   // ── NEW: split seniority state (same logic as SiteBookingForm) ────────────
   const [seniorityInput, setSeniorityInput] = useState("");
+
+  // Auto-detect admin name from localStorage (set on login)
+  const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
+  const createdBy = adminData?.username || adminData?.name || "Admin";
 
   // Multiple Transaction IDs (min 1, max 3)
   const [transactionIds, setTransactionIds] = useState([""]);
@@ -664,7 +668,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               .map((b) => b.bank)
               .filter(Boolean)
               .join(", "),
-            created_by: "Admin",
+            created_by: createdBy,
             pdfBase64,
             pdfFilename: filename,
           };
@@ -836,7 +840,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={"/images/logoblackwhite.jpeg"}
+            src={"/images/logoblack.jpeg"}
             alt="Logo"
             style={{
               width: "150px",

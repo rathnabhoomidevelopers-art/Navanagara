@@ -10,7 +10,7 @@ export function SiteBookingList() {
   const isAdmin = !!localStorage.getItem("adminToken");
   const canCancel = isSuperAdmin || isAdmin;
 
-  const headers = ["Date", "Member Name", "Seniority No.", "Project Name", ""];
+  const headers = ["Date", "Member Name", "Seniority No.", "Project Name", "Actions"];
   const [Memberdetails, SetMemberDetails] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -349,7 +349,7 @@ export function SiteBookingList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-start text-white font-semibold text-base tracking-wide"
+                    className="px-6 py-4 text-start text-white font-semibold text-[20px] tracking-wide"
                   >
                     {header}
                   </th>
