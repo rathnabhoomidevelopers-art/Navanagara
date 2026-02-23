@@ -349,7 +349,7 @@ export function SiteBookingList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-start text-white font-semibold text-[20px] tracking-wide"
+                    className="px-6 py-4 text-center text-white font-semibold text-[20px] tracking-wide"
                   >
                     {header}
                   </th>

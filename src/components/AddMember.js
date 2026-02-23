@@ -764,7 +764,7 @@ const AddMember = () => {
                 {/* Father Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Father Name <span className="text-red-500">*</span>
+                    Father / Husband Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"

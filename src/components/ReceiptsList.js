@@ -189,7 +189,7 @@ export function ReceiptList() {
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="px-6 py-4 text-start text-white font-semibold text-[20px] tracking-wide"
+                    className="px-6 py-4 text-center text-white font-semibold text-base tracking-wide"
                   >
                     {header}
                   </th>
@@ -472,12 +472,9 @@ export function ReceiptList() {
                     selectedMember.paymentmode,
                   )}
                   {editField("Select Bank", "bank", selectedMember.bank)}
-                  {/* Created By — only visible to superadmin */}
                   {isSuperAdmin && (
                     <div className="border-b border-gray-200 pb-4">
-                      <dt className="inline font-semibold text-[#8356D6]">
-                        Created By:{" "}
-                      </dt>
+                      <dt className="inline font-semibold">Created By: </dt>
                       <dd className="inline font-normal ml-1">
                         <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
                           👤 {selectedMember.created_by || "-"}
