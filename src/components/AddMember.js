@@ -146,7 +146,6 @@ const AddMember = () => {
         .matches(/^[A-Za-z\s]+$/, "Only letters allowed"),
       BirthPlace: yup
         .string()
-        .required("Birth place is required")
         .matches(/^[A-Za-z\s]+$/, "Only letters allowed"),
       AlternateMobileNumber: yup
         .string()
@@ -786,7 +785,7 @@ const AddMember = () => {
                 {/* Birth Place */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Birth Place <span className="text-red-500">*</span>
+                    Birth Place 
                   </label>
                   <input
                     type="text"

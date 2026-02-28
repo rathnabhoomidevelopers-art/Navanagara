@@ -76,27 +76,21 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
   const receiptRef = useRef(null);
   const [memberAddresses, setMemberAddresses] = useState([]);
 
-  // ── NEW: split seniority state (same logic as SiteBookingForm) ────────────
   const [seniorityInput, setSeniorityInput] = useState("");
 
-  // Created By — admin names
   const ADMIN_NAMES = ["Vanita", "Sonakshi"];
   const [createdBy, setCreatedBy] = useState(ADMIN_NAMES[0]);
 
-  // Multiple Transaction IDs (min 1, max 3)
   const [transactionIds, setTransactionIds] = useState([""]);
 
-  // Multiple Banks (min 1, max 3)
   const [selectedBanks, setSelectedBanks] = useState([
     { bank: "State Bank Of India", branch: "" },
   ]);
 
-  // Multiple Booking Advance rows with checked field
   const [bookingAdvanceRows, setBookingAdvanceRows] = useState([
     { amount: 0, checked: false },
   ]);
 
-  // Dropdown options
   const paymentModes = [
     "Cheque",
     "Cash",
@@ -119,7 +113,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     "IndusInd Bank",
   ];
 
-  // Initialize payment items — remove Booking Advance from list (handled separately)
   const [paymentItems, setPaymentItems] = useState(
     paymentItemsList
       .filter((item) => item !== "Booking Advance")
@@ -251,7 +244,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           formik.setFieldValue("siteDimension", siteBookingFound.sitedimension);
         }
 
-        // ── Auto-fill address from member's saved addresses ──────────────────
         const addresses = [];
         if (memberFound?.permanentaddress)
           addresses.push({
@@ -264,7 +256,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             value: memberFound.correspondenceaddress,
           });
         setMemberAddresses(addresses);
-        // Auto-select the first address
         if (addresses.length > 0) {
           formik.setFieldValue("flatNumber", addresses[0].value);
         }
@@ -368,7 +359,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     checkMemberAndReceipts(formik.values.seniorityNumber);
   }, [formik.values.seniorityNumber]);
 
-  // ── auto-build full seniority number when project or digits change ──────────
+  // auto-build full seniority number when project or digits change
   useEffect(() => {
     if (formik.values.projectType && seniorityInput) {
       const selectedProject = PROJECT_TYPES.find(
@@ -387,7 +378,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.projectType, seniorityInput]);
 
-  // only digits, max 3 chars
   const handleSeniorityInputChange = (e) => {
     setSeniorityInput(e.target.value.replace(/\D/g, "").slice(0, 3));
   };
@@ -549,7 +539,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     return `${day}-${month}-${year}`;
   };
 
-  // Download PDF and Email — captures ReceiptContent via html2canvas (same as preview)
+  // Download PDF
   const handleDownloadPDF = async () => {
     if (!memberExists) {
       toast.error(
@@ -579,26 +569,21 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const html2canvas = (await import("html2canvas")).default;
         const { default: jsPDF } = await import("jspdf");
 
-        // ── Render ReceiptContent into a hidden off-screen container ──────────
-        // This captures the EXACT same HTML as the preview modal
         const container = document.createElement("div");
         container.style.cssText =
-          "position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:10mm 8mm;box-sizing:border-box;";
+          "position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:2mm 2mm;box-sizing:border-box;";
 
-        // Mount a temporary React root to render ReceiptContent into container
         const { createRoot } = await import("react-dom/client");
         const root = createRoot(container);
         document.body.appendChild(container);
 
         await new Promise((resolve) => {
           root.render(<ReceiptContent />);
-          // Wait for images (logo) to load
           setTimeout(resolve, 800);
         });
 
-        // ── Capture with html2canvas ──────────────────────────────────────────
         const canvas = await html2canvas(container, {
-          scale: 2,
+          scale: 6,
           useCORS: true,
           allowTaint: true,
           logging: false,
@@ -609,8 +594,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         root.unmount();
         document.body.removeChild(container);
 
-        // ── Convert canvas to PDF ─────────────────────────────────────────────
-        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        const imgData = canvas.toDataURL("image/jpeg", 0.85);
         const pdf = new jsPDF({
           orientation: "portrait",
           unit: "mm",
@@ -622,18 +606,26 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const imgWidth = pdfWidth;
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        let finalWidth = imgWidth;
-        let finalHeight = imgHeight;
-        if (imgHeight > pdfHeight) {
-          finalHeight = pdfHeight;
-          finalWidth = (canvas.width * pdfHeight) / canvas.height;
+        let yOffset = 0;
+        if (imgHeight < pdfHeight) {
+          yOffset = (pdfHeight - imgHeight) / 2;
         }
 
-        const xOffset = (pdfWidth - finalWidth) / 2;
-        pdf.addImage(imgData, "JPEG", xOffset, 0, finalWidth, finalHeight);
+        pdf.addImage(imgData, "PNG", 0, yOffset, imgWidth, imgHeight);
 
-        // ── Build payload for backend (Cloudinary + email) ────────────────────
-        const filename = `Receipt_${(formik.values.receiptNo || "draft").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+        const projectPart = (formik.values.projectType || "").replace(
+          /[^a-zA-Z0-9]/g,
+          "_",
+        );
+        const seniorityPart = (formik.values.seniorityNumber || "").replace(
+          /[^a-zA-Z0-9]/g,
+          "_",
+        );
+        const receiptPart = (formik.values.receiptNo || "draft").replace(
+          /[^a-zA-Z0-9]/g,
+          "_",
+        );
+        const filename = `${projectPart}_${seniorityPart}_${receiptPart}.pdf`;
         const pdfBase64 = pdf.output("datauristring").split(",")[1];
 
         const checkedBookingAdvances = bookingAdvanceRows.filter(
@@ -657,7 +649,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             name: formik.values.receivedFrom,
             projectname: formik.values.projectType,
             date: formik.values.receiptDate,
-            amountpaid: total,
+            amountpaid: adjustedTotal,
             mobilenumber: formik.values.phoneNumber,
             email: formik.values.Email,
             paymentmode: formik.values.paymentMode,
@@ -702,12 +694,12 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     }
   };
 
+  // ── Raw total (for form display) ──────────────────────────────────────────
   const total = calculateTotal();
-  const amountInWords = numberToWords(total);
 
+  // ── Membership fee adjustment logic ───────────────────────────────────────
   const shouldApplyMembershipFeeAdjustment = () => {
     if (!memberExists || hasExistingReceipt) return false;
-
     const userSelectedMembershipItems = paymentItems.some(
       (item) => item.checked && MEMBERSHIP_BREAKDOWN[item.name] !== undefined,
     );
@@ -724,10 +716,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
     let remaining = TOTAL_MEMBERSHIP_FEE;
 
-    // 1️⃣ Deduct from regular payment items first
     for (let i = 0; i < adjustedItems.length; i++) {
       const item = adjustedItems[i];
-
       if (
         item.checked &&
         !MEMBERSHIP_BREAKDOWN[item.name] &&
@@ -735,7 +725,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         remaining > 0
       ) {
         const amt = parseFloat(item.amount);
-
         if (amt >= remaining) {
           adjustedItems[i].amount = amt - remaining;
           remaining = 0;
@@ -747,7 +736,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       }
     }
 
-    // 2️⃣ If still remaining, deduct from booking advance
     if (remaining > 0) {
       for (let i = 0; i < adjustedAdvance.length; i++) {
         if (
@@ -756,7 +744,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           remaining > 0
         ) {
           const amt = parseFloat(adjustedAdvance[i].amount);
-
           if (amt >= remaining) {
             adjustedAdvance[i].amount = amt - remaining;
             remaining = 0;
@@ -769,7 +756,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       }
     }
 
-    // 3️⃣ Add membership breakdown rows
     if (remaining === 0) {
       Object.keys(MEMBERSHIP_BREAKDOWN).forEach((itemName) => {
         const index = adjustedItems.findIndex((i) => i.name === itemName);
@@ -788,13 +774,29 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
   const { adjustedItems, adjustedAdvance } = getAdjustedBreakdownData();
 
+  // ── Adjusted total (for receipt display) ─────────────────────────────────
+  const getAdjustedTotal = () => {
+    const itemsTotal = adjustedItems.reduce((sum, item) => {
+      return sum + (item.checked ? parseFloat(item.amount || 0) : 0);
+    }, 0);
+    const advanceTotal = adjustedAdvance.reduce((sum, row) => {
+      return sum + (row.checked ? parseFloat(row.amount || 0) : 0);
+    }, 0);
+    return itemsTotal + advanceTotal;
+  };
+
+  const adjustedTotal = getAdjustedTotal();
+  const amountInWords = numberToWords(adjustedTotal);
+
+  // ── Table 1 items — uses adjusted amounts ─────────────────────────────────
   const getAllCheckedItems = () => {
-    const items = paymentItems.filter(
+    const items = adjustedItems.filter(
       (item) =>
-        item.checked && item.amount > 0 && !MEMBERSHIP_BREAKDOWN[item.name],
+        item.checked &&
+        parseFloat(item.amount) > 0 &&
+        !MEMBERSHIP_BREAKDOWN[item.name],
     );
 
-    // ✅ RAW rows — show exactly what was entered, no deduction
     const checkedAdvanceRows = bookingAdvanceRows.filter(
       (row) => row.checked && parseFloat(row.amount) > 0,
     );
@@ -804,14 +806,14 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         checkedAdvanceRows.length > 1
           ? `Booking Advance ${i + 1}`
           : "Booking Advance",
-      amount: row.amount,
+      amount: adjustedAdvance[i]?.amount ?? row.amount,
       checked: true,
     }));
 
     return [...items, ...advanceItems];
   };
 
-  // Receipt Content Component — Doc1 style/layout with Doc2 data logic
+  // ── Receipt Content Component ─────────────────────────────────────────────
   const ReceiptContent = () => (
     <div
       style={{
@@ -828,19 +830,20 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           alignItems: "center",
           height: "150px",
           borderBottom: "2px solid #000000",
-          paddingBottom: "0px",
-          paddingTop: "0px",
+          paddingBottom: "15px",
+          paddingTop: "0x",
+          marginTop: "0px",
           marginBottom: "16px",
           marginLeft: "-20px",
           marginRight: "-20px",
           paddingLeft: "10px",
-          paddingRight: "10px",
+          paddingRight: "0px",
           gap: "10px",
         }}
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={"/images/logoblackwhite.jpeg"}
+            src={"/images/logoblack.jpeg"}
             alt="Logo"
             style={{
               width: "150px",
@@ -853,7 +856,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         <div style={{ flex: 1, textAlign: "center" }}>
           <div
             style={{
-              fontSize: "14px",
+              fontSize: "18px",
               fontWeight: "bold",
               marginBottom: "4px",
             }}
@@ -862,7 +865,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           </div>
           <div
             style={{
-              fontSize: "14px",
+              fontSize: "15px",
               fontWeight: "bold",
               marginBottom: "4px",
             }}
@@ -905,7 +908,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       </div>
 
       {/* RECEIPT Label */}
-      <div style={{ textAlign: "center", marginBottom: "12px" }}>
+      <div style={{ textAlign: "center", paddingBottom: "6px" }}>
         <span
           style={{
             border: "2px solid #000000",
@@ -937,18 +940,36 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
       {/* Received From Section */}
       <div style={{ fontSize: "13px", marginBottom: "16px" }}>
-        <div style={{ marginBottom: "4px" }}>
+        <div
+          style={{
+            marginBottom: "6px",
+            paddingBottom: "6px",
+            borderBottom: "1.5px solid #000",
+          }}
+        >
           <strong>
             Received From Smt./Shree: {formik.values.receivedFrom}
           </strong>
         </div>
-        <div style={{ marginBottom: "4px" }}>
+        <div
+          style={{
+            marginBottom: "6px",
+            paddingBottom: "6px",
+            borderBottom: "1.5px solid #000",
+          }}
+        >
           <strong>Address: {formik.values.flatNumber}</strong>
         </div>
-        <div style={{ marginBottom: "4px" }}>
+        <div
+          style={{
+            marginBottom: "6px",
+            paddingBottom: "6px",
+            borderBottom: "1.5px solid #000",
+          }}
+        >
           <strong>Rupees: {amountInWords} Only.</strong>
         </div>
-        <div>
+        <div style={{ paddingBottom: "6px", borderBottom: "1.5px solid #000" }}>
           <strong>
             Seniority Number: {formik.values.projectType} (
             {formik.values.seniorityNumber})
@@ -956,7 +977,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         </div>
       </div>
 
-      {/* Table 1: Payment Details — RAW entered amounts, only selected items */}
+      {/* Table 1: Payment Details */}
       <div style={{ marginBottom: "16px" }}>
         <table
           style={{
@@ -1082,7 +1103,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         </table>
       </div>
 
-      {/* Table 2: Particulars Breakdown — ALL items, adjusted amounts, dash for unselected */}
+      {/* Table 2: Particulars Breakdown */}
       <div style={{ marginBottom: "16px" }}>
         <table
           style={{
@@ -1146,7 +1167,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             </tr>
           </thead>
           <tbody>
-            {/* ALL regular payment items — adjusted amounts — "-" for unchecked */}
             {adjustedItems.map((item, index) => {
               const hasAmount = item.checked && parseFloat(item.amount) > 0;
               return (
@@ -1157,6 +1177,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       padding: "8px",
                       textAlign: "center",
                       width: "5%",
+                      
                     }}
                   >
                     {index + 1}.
@@ -1179,7 +1200,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               );
             })}
 
-            {/* ALL Booking Advance rows — adjusted amounts — "-" for unchecked */}
             {bookingAdvanceRows.map((row, index) => {
               const hasAmount = row.checked && parseFloat(row.amount) > 0;
               const displayAmount = hasAmount
@@ -1234,7 +1254,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   textAlign: "center",
                 }}
               >
-                <strong>{total}</strong>
+                <strong>{adjustedTotal}</strong>
               </td>
               <td style={{ border: "1px solid #000000", padding: "8px" }}></td>
             </tr>
@@ -1268,18 +1288,35 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
   return (
     <div className="min-h-screen bg-white">
       <style>{`
-        @media print {
-          body { background: white !important; margin: 0 !important; padding: 0 !important; }
-          html, body { height: 100%; overflow: visible; }
-          .no-print { display: none !important; }
-          .print-container { display: block !important; position: relative !important; left: 0 !important; visibility: visible !important; }
-          .a4-receipt { box-shadow: none !important; margin: 0 !important; width: 210mm !important; min-height: 297mm !important; padding: 10mm 8mm !important; page-break-after: avoid !important; display: block !important; visibility: visible !important; }
-          @page { size: A4 portrait; margin: 0; }
-        }
-        body { background: white !important; }
-        .a4-receipt { width: 210mm; min-height: 297mm; padding: 10mm 8mm; background: white; margin: 0 auto; box-sizing: border-box; }
-        .receipt-panel { font-family: Arial, sans-serif; }
-      `}</style>
+ @media print {
+  body { background: white !important; margin: 0 !important; padding: 0 !important; }
+  html, body { height: 100%; overflow: visible; }
+  .no-print { display: none !important; }
+  .print-container { display: block !important; position: relative !important; left: 0 !important; visibility: visible !important; }
+  .a4-receipt { 
+    box-shadow: none !important; 
+    margin: 0 !important; 
+    width: 210mm !important; 
+    min-height: 297mm !important; 
+    padding: 2mm 2mm !important;  /* Minimal padding */
+    page-break-after: avoid !important; 
+    display: block !important; 
+    visibility: visible !important; 
+  }
+  @page { size: A4 portrait; margin: 0; }
+}
+
+body { background: white !important; }
+.a4-receipt { 
+  width: 210mm; 
+  min-height: 297mm; 
+  padding: 2mm 2mm; /* Minimal padding */
+  background: white; 
+  margin: 0 auto; 
+  box-sizing: border-box; 
+}
+.receipt-panel { font-family: Arial, sans-serif; }
+`}</style>
 
       <div>
         <Header />
@@ -1304,7 +1341,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.receiptNo}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Enter Receipt No."
+                    placeholder="e.g., RCP/2024/001"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.receiptNo && formik.errors.receiptNo
                         ? "border-red-500 focus:ring-red-500"
@@ -1318,7 +1355,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   )}
                 </div>
 
-                {/* ── CHANGED: Project Name — now shown before seniority so prefix is set first ── */}
+                {/* Project Name */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Project Name <span className="text-red-500">*</span>
@@ -1338,24 +1375,22 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   </select>
                 </div>
 
-                {/* ── CHANGED: Seniority Number — 3-digit input + auto-generated code prefix ── */}
+                {/* Seniority Number */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Seniority Number <span className="text-red-500">*</span>
                   </label>
                   <div className="flex items-center gap-2">
-                    {/* Read-only prefix badge */}
                     <span className="px-2 py-1.5 text-sm font-semibold bg-purple-100 text-purple-700 border border-purple-300 rounded-md whitespace-nowrap">
                       {PROJECT_TYPES.find(
                         (p) => p.name === formik.values.projectType,
                       )?.code || "---"}
                     </span>
-                    {/* 3-digit number input */}
                     <input
                       type="text"
                       value={seniorityInput}
                       onChange={handleSeniorityInputChange}
-                      placeholder="Enter Seniority No."
+                      placeholder="001"
                       maxLength={3}
                       className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                         formik.touched.seniorityNumber &&
@@ -1365,7 +1400,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       }`}
                     />
                   </div>
-                  {/* Show generated full number */}
                   {formik.values.seniorityNumber && (
                     <p className="text-xs text-blue-600 font-semibold mt-1">
                       Generated: {formik.values.seniorityNumber}
@@ -1420,7 +1454,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.receivedFrom}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Enter Member Name"
+                    placeholder="Auto-filled from database"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.receivedFrom && formik.errors.receivedFrom
                         ? "border-red-500 focus:ring-red-500"
@@ -1518,7 +1552,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.siteDimension}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Enter Site Dimension"
+                    placeholder="e.g., 30x40"
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -1596,7 +1630,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     value={formik.values.phoneNumber}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="Enter Mobile No."
+                    placeholder="Auto-filled from database"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.phoneNumber && formik.errors.phoneNumber
                         ? "border-red-500 focus:ring-red-500"
@@ -1621,7 +1655,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.Email}
-                    placeholder="Enter Member Email"
+                    placeholder="Auto-filled from database"
                     className={`w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 ${
                       formik.touched.Email && formik.errors.Email
                         ? "border-red-500 focus:ring-red-500"
@@ -1665,15 +1699,13 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Address <span className="text-red-500">*</span>
                   </label>
-
-                  {/* Dropdown — shows member's saved addresses to pick from */}
                   {memberAddresses.length > 0 && (
                     <select
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white mb-2"
                       value={formik.values.flatNumber}
-                      onChange={(e) => {
-                        formik.setFieldValue("flatNumber", e.target.value);
-                      }}
+                      onChange={(e) =>
+                        formik.setFieldValue("flatNumber", e.target.value)
+                      }
                     >
                       <option value="" disabled>
                         — Select a saved address —
@@ -1685,8 +1717,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       ))}
                     </select>
                   )}
-
-                  {/* Editable textarea — always shown, can type custom address */}
                   <textarea
                     name="flatNumber"
                     value={formik.values.flatNumber}
@@ -1879,7 +1909,9 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
                   >
                     {ADMIN_NAMES.map((name) => (
-                      <option key={name} value={name}>{name}</option>
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
                     ))}
                   </select>
                   <input
@@ -1918,7 +1950,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           </div>
         </form>
 
-        {/* Receipt preview still used for Preview Modal only */}
         <div style={{ display: "none" }}>
           <div ref={receiptRef} />
         </div>
