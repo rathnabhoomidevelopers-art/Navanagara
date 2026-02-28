@@ -211,7 +211,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       );
 
       const sitebookingsResponse = await axios.get(
-        `${API_BASE}/sitebookings`,
+         `${API_BASE}/sitebookings`,
       );
       const sitebookings = sitebookingsResponse.data || [];
       const siteBookingFound = sitebookings.find(
@@ -261,7 +261,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         }
 
         const receiptsResponse = await axios.get(
-          `${API_BASE}/receipts`,
+           `${API_BASE}/receipts`,
         );
         const receipts = receiptsResponse.data.data || [];
         const existingReceipt = receipts.find(
@@ -297,12 +297,12 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
   // Validation Schema
   const validationSchema = Yup.object().shape({
-    receiptNo: Yup.string()
-      .required("Receipt number is required")
-      .matches(
-        /^[A-Z0-9-/]+$/i,
-        "Only letters, numbers, hyphens, and slashes allowed",
-      ),
+   receiptNo: Yup.string()
+  .required("Receipt number is required")
+  .matches(
+    /^[0-9]+$/,
+    "Only numbers allowed",
+  ),
     receiptDate: Yup.date().required("Date is required"),
     receivedFrom: Yup.string()
       .required("Received from name is required")
@@ -322,23 +322,23 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       .min(10, "Please provide complete address (minimum 10 characters)"),
     seniorityNumber: Yup.string().required("Seniority number is required"),
     paymentMode: Yup.string().required("Payment mode is required"),
-    bankName: Yup.string().when("paymentMode", {
-      is: (val) => val !== "Cash",
-      then: (schema) =>
-        schema.required("Bank name required for non-cash payments"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    branch: Yup.string().when("paymentMode", {
-      is: (val) => val !== "Cash",
-      then: (schema) =>
-        schema.required("Branch name required for non-cash payments"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    chequeNo: Yup.string().when("paymentMode", {
-      is: (val) => val !== "Cash",
-      then: (schema) => schema.required("Transaction ID is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+   bankName: Yup.string().when("paymentMode", {
+         is: (val) => val !== "Cash",
+         then: (schema) =>
+           schema.required("Bank name required for non-cash payments"),
+         otherwise: (schema) => schema.notRequired(),
+       }),
+       branch: Yup.string().when("paymentMode", {
+         is: (val) => val !== "Cash",
+         then: (schema) =>
+           schema.required("Branch name required for non-cash payments"),
+         otherwise: (schema) => schema.notRequired(),
+       }),
+       chequeNo: Yup.string().when("paymentMode", {
+         is: (val) => val !== "Cash",
+         then: (schema) => schema.required("Transaction ID is required"),
+         otherwise: (schema) => schema.notRequired(),
+       }),
   });
 
   // Formik setup
@@ -570,9 +570,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const { default: jsPDF } = await import("jspdf");
 
         const container = document.createElement("div");
-        container.style.cssText =
-          "position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:2mm 2mm;box-sizing:border-box;";
-
+       container.style.cssText =
+  "position:fixed;left:-9999px;top:0;width:786px;background:#fff;padding:4px;margin:4px;box-sizing:border-box;";
         const { createRoot } = await import("react-dom/client");
         const root = createRoot(container);
         document.body.appendChild(container);
@@ -582,15 +581,16 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           setTimeout(resolve, 800);
         });
 
-        const canvas = await html2canvas(container, {
+       const canvas = await html2canvas(container, {
           scale: 6,
           useCORS: true,
           allowTaint: true,
           logging: false,
-          backgroundColor: "#ffffff",
-          width: 794,
-        });
-
+         backgroundColor: "#ffffff",
+         width: 794,
+           x: -4,   // ← ADD THIS
+           y: -4,   // ← ADD THIS
+          });
         root.unmount();
         document.body.removeChild(container);
 
@@ -606,12 +606,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const imgWidth = pdfWidth;
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        let yOffset = 0;
-        if (imgHeight < pdfHeight) {
-          yOffset = (pdfHeight - imgHeight) / 2;
-        }
-
-        pdf.addImage(imgData, "PNG", 0, yOffset, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 1, 1, pdfWidth - 2, pdfHeight - 2);
 
         const projectPart = (formik.values.projectType || "").replace(
           /[^a-zA-Z0-9]/g,
@@ -625,7 +620,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           /[^a-zA-Z0-9]/g,
           "_",
         );
-        const filename = `${projectPart}_${seniorityPart}_${receiptPart}.pdf`;
+        const filename = `${projectPart}_${seniorityPart}.pdf`;
         const pdfBase64 = pdf.output("datauristring").split(",")[1];
 
         const checkedBookingAdvances = bookingAdvanceRows.filter(
@@ -666,7 +661,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           };
 
           const response = await axios.post(
-            `${API_BASE}/receipt`,
+             `${API_BASE}/receipt`,
             receiptPayload,
           );
           if (response.data.success) {
@@ -984,7 +979,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             width: "100%",
             borderCollapse: "collapse",
             border: "1px solid #000000",
-            fontSize: "11px",
+            fontSize: "12px",
           }}
         >
           <thead>
@@ -1005,7 +1000,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     padding: "6px",
                     textAlign: "center",
                     fontWeight: "bold",
-                    fontSize: "10px",
+                    fontSize: "12px",
                     backgroundColor: "#f0f0f0",
                   }}
                 >
@@ -1016,8 +1011,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           </thead>
           <tbody>
             {getAllCheckedItems().map((item, index) => {
-              const bank = selectedBanks[index] || selectedBanks[0];
-              const transactionId = transactionIds[index] || transactionIds[0];
+              const bank = selectedBanks[index];
+              const transactionId = transactionIds[index];
               return (
                 <tr key={index}>
                   <td
@@ -1025,7 +1020,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
                     {index + 1}
@@ -1035,7 +1030,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
                     {item.name}
@@ -1045,7 +1040,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
                     {formik.values.paymentMode}
@@ -1055,43 +1050,37 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
-                    {formik.values.paymentMode === "Cash"
-                      ? ""
-                      : bank?.bank || ""}
+                     {formik.values.paymentMode === "Cash" ? "" : bank?.bank || selectedBanks[0]?.bank || ""}
                   </td>
                   <td
                     style={{
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
-                    {formik.values.paymentMode === "Cash"
-                      ? ""
-                      : bank?.branch || ""}
+                     {formik.values.paymentMode === "Cash" ? "" : bank?.branch || selectedBanks[0]?.branch || ""}
                   </td>
                   <td
                     style={{
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "center",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
-                    {formik.values.paymentMode === "Cash"
-                      ? ""
-                      : transactionId || ""}
+ {formik.values.paymentMode === "Cash" ? "" : transactionId || transactionIds[0] || ""}
                   </td>
                   <td
                     style={{
                       border: "1px solid #000000",
                       padding: "6px",
                       textAlign: "right",
-                      fontSize: "10px",
+                      fontSize: "11px",
                     }}
                   >
                     {item.amount}
@@ -1177,7 +1166,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       padding: "8px",
                       textAlign: "center",
                       width: "5%",
-                      
                     }}
                   >
                     {index + 1}.
@@ -1293,26 +1281,26 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
   html, body { height: 100%; overflow: visible; }
   .no-print { display: none !important; }
   .print-container { display: block !important; position: relative !important; left: 0 !important; visibility: visible !important; }
-  .a4-receipt { 
-    box-shadow: none !important; 
-    margin: 0 !important; 
-    width: 210mm !important; 
-    min-height: 297mm !important; 
-    padding: 2mm 2mm !important;  /* Minimal padding */
-    page-break-after: avoid !important; 
-    display: block !important; 
-    visibility: visible !important; 
-  }
+ .a4-receipt { 
+  box-shadow: none !important; 
+  margin: 0 !important; 
+  width: 210mm !important; 
+  min-height: 297mm !important; 
+  padding: 6px 6px!important;
+  page-break-after: avoid !important; 
+  display: block !important; 
+  visibility: visible !important; 
+}
   @page { size: A4 portrait; margin: 0; }
 }
 
 body { background: white !important; }
 .a4-receipt { 
-  width: 210mm; 
+  width: 206mm; 
   min-height: 297mm; 
-  padding: 2mm 2mm; /* Minimal padding */
+  padding: 6px 6px;
   background: white; 
-  margin: 0 auto; 
+  margin: 2mm auto; 
   box-sizing: border-box; 
 }
 .receipt-panel { font-family: Arial, sans-serif; }
@@ -1490,7 +1478,9 @@ body { background: white !important; }
                 </div>
 
                 {/* Transaction IDs */}
-                <div className="md:col-span-2">
+                
+                 {formik.values.paymentMode !== "Cash" && (
+                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Transaction ID <span className="text-red-500">*</span>
                     <span className="text-gray-400 ml-1">(max 3)</span>
@@ -1526,7 +1516,8 @@ body { background: white !important; }
                       + Add Transaction ID
                     </button>
                   )}
-                </div>
+              </div>
+                 )}
 
                 {/* Paid Amount */}
                 <div>
@@ -2006,7 +1997,7 @@ body { background: white !important; }
                     minHeight: "297mm",
                     margin: "0 auto",
                     backgroundColor: "#ffffff",
-                    padding: "10mm 8mm",
+                    padding: "6px 6px",
                     boxSizing: "border-box",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
                   }}
