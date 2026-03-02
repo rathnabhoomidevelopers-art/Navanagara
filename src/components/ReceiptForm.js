@@ -7,13 +7,11 @@ import { Header } from "./Header";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 
-// Project types with their shortforms
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
   { name: "New City 1", code: "NCS" },
 ];
 
-// Default form values
 const defaultFormData = {
   societyName: "NAVANAGARA HOUSE BUILDING CO-OPERATIVE SOCIETY LTD.",
   societyNameKannada: "ನವನಗರ ಹೌಸ್ ಬಿಲ್ಡಿಂಗ್ ಕೋ-ಆಪರೇಟಿವ್ ಸೊಸೈಟಿ ಲಿ.",
@@ -54,7 +52,6 @@ const paymentItemsList = [
   "Miscellaneous",
 ];
 
-// Membership fee breakdown for new members
 const MEMBERSHIP_BREAKDOWN = {
   Share: 2000,
   "Membership Fee": 200,
@@ -123,7 +120,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       })),
   );
 
-  // Transaction ID Handlers
   const addTransactionId = () => {
     if (transactionIds.length < 3) {
       setTransactionIds([...transactionIds, ""]);
@@ -145,7 +141,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     formik.setFieldValue("chequeNo", updated[0] || "");
   };
 
-  // Bank Handlers
   const addBank = () => {
     if (selectedBanks.length < 3) {
       setSelectedBanks([...selectedBanks, { bank: "", branch: "" }]);
@@ -169,7 +164,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     formik.setFieldValue("branch", updated[0]?.branch || "");
   };
 
-  // Booking Advance Handlers
   const addBookingAdvanceRow = () => {
     if (bookingAdvanceRows.length < 3) {
       setBookingAdvanceRows([
@@ -191,7 +185,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     setBookingAdvanceRows(updated);
   };
 
-  // Check if member exists and if they have existing receipts
   const checkMemberAndReceipts = async (seniorityNumber) => {
     if (!seniorityNumber || seniorityNumber.length < 3) {
       setMemberExists(false);
@@ -689,10 +682,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     }
   };
 
-  // ── Raw total (for form display) ──────────────────────────────────────────
   const total = calculateTotal();
 
-  // ── Membership fee adjustment logic ───────────────────────────────────────
   const shouldApplyMembershipFeeAdjustment = () => {
     if (!memberExists || hasExistingReceipt) return false;
     const userSelectedMembershipItems = paymentItems.some(
@@ -769,7 +760,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
   const { adjustedItems, adjustedAdvance } = getAdjustedBreakdownData();
 
-  // ── Adjusted total (for receipt display) ─────────────────────────────────
   const getAdjustedTotal = () => {
     const itemsTotal = adjustedItems.reduce((sum, item) => {
       return sum + (item.checked ? parseFloat(item.amount || 0) : 0);
@@ -783,7 +773,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
   const adjustedTotal = getAdjustedTotal();
   const amountInWords = numberToWords(adjustedTotal);
 
-  // ── Table 1 items — uses adjusted amounts ─────────────────────────────────
   const getAllCheckedItems = () => {
     const items = adjustedItems.filter(
       (item) =>
@@ -808,7 +797,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     return [...items, ...advanceItems];
   };
 
-  // ── Receipt Content Component ─────────────────────────────────────────────
   const ReceiptContent = () => (
     <div
       style={{
@@ -838,7 +826,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={"/images/logo.webp"}
+            src={"/images/logoblack.webp"}
             alt="Logo"
             style={{
               width: "150px",
