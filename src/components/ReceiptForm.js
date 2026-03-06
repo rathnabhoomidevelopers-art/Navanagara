@@ -974,6 +974,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             <tr>
               {[
                 "S.No",
+                "Dimension",
                 "Payment Type",
                 "Payment Mode",
                 "Bank",
@@ -1012,6 +1013,16 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                     }}
                   >
                     {index + 1}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #000000",
+                      padding: "6px",
+                      textAlign: "center",
+                      fontSize: "11px",
+                    }}
+                  >
+                    {formik.values.siteDimension}
                   </td>
                   <td
                     style={{
