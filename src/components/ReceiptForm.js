@@ -10,6 +10,27 @@ const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 // While the receipt is being captured for the PDF, the logo is hidden in the capture
 // and drawn directly onto the PDF page instead (so it can never go missing).
 let CAPTURING_PDF = false;
+
+// html2canvas draws every line of text a few pixels lower than the browser does.
+// While capturing for the PDF we lift all text by that amount (on the temporary clone only,
+// so the on-screen Preview is untouched).
+const PDF_TEXT_LIFT_PX = 7;
+const liftTextForPdf = (doc, root) => {
+  if (!root) return;
+  const walker = doc.createTreeWalker(root, 4); // 4 = NodeFilter.SHOW_TEXT
+  const nodes = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue && node.nodeValue.trim() && node.parentNode) nodes.push(node);
+  }
+  nodes.forEach((t) => {
+    const span = doc.createElement("span");
+    span.style.position = "relative";
+    span.style.top = `-${PDF_TEXT_LIFT_PX}px`;
+    t.parentNode.insertBefore(span, t);
+    span.appendChild(t);
+  });
+};
 // Logo position on the 794 x 1123 px receipt page (px) -> converted to mm for the PDF
 const LOGO_RECT_PX = { x: 16, y: 25, w: 148, h: 120 };
 
@@ -574,6 +595,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const container = document.createElement("div");
        container.style.cssText =
   "position:fixed;left:-9999px;top:0;width:794px;height:1123px;background:#fff;padding:4px;margin:0;box-sizing:border-box;";
+        container.id = "receipt-pdf-capture";
         const { createRoot } = await import("react-dom/client");
         const root = createRoot(container);
         document.body.appendChild(container);
@@ -606,6 +628,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
          backgroundColor: "#ffffff",
          width: 794,
          height: 1123,
+         onclone: (clonedDoc) =>
+           liftTextForPdf(clonedDoc, clonedDoc.getElementById("receipt-pdf-capture")),
           });
         CAPTURING_PDF = false;
         root.unmount();
@@ -866,14 +890,14 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     // Only the row spacing inside the two tables shrinks to make everything fit.
     const paymentRowCount = Math.max(1, getAllCheckedItems().length); // top table rows
     const particularsRowCount = adjustedItems.length + bookingAdvanceRows.length; // list rows
-    const MIDDLE_SPACE = 762; // px available between header and footer
+    const MIDDLE_SPACE = 800; // px available between header and footer
     const contentAtZeroPad =
       512 + 25 * (paymentRowCount - 1) + 18 * (particularsRowCount - 12);
     const rowPad = Math.max(
       2,
       Math.min(16, Math.floor((MIDDLE_SPACE - contentAtZeroPad) / (particularsRowCount + 1))),
     );
-    const padTop = Math.round(rowPad * 0.3);
+    const padTop = Math.floor(rowPad / 2);
     const particularsPad = `${padTop}px 8px ${rowPad - padTop}px`;
     return (
     <div
@@ -882,6 +906,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         backgroundColor: "#ffffff",
         padding: "0px 20px 20px 20px",
         fontFamily: "Arial, sans-serif",
+        lineHeight: 1.5, // fixed so the layout is identical on every page/browser
         boxSizing: "border-box",
         height: "1115px",
         display: "flex",
@@ -1069,7 +1094,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   key={i}
                   style={{
                     border: "1px solid #000000",
-                    padding: "3px 6px 9px",
+                    padding: "6px",
                     textAlign: "center",
                     fontWeight: "bold",
                     fontSize: "12px",
@@ -1090,7 +1115,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1100,7 +1125,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1110,7 +1135,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1120,7 +1145,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1130,7 +1155,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1140,7 +1165,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1150,7 +1175,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1160,7 +1185,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "3px 6px 9px",
+                      padding: "6px",
                       textAlign: "right",
                       fontSize: "11px",
                     }}
