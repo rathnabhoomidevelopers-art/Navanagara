@@ -7,6 +7,12 @@ import { Header } from "./Header";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 
+// While the receipt is being captured for the PDF, the logo is hidden in the capture
+// and drawn directly onto the PDF page instead (so it can never go missing).
+let CAPTURING_PDF = false;
+// Logo position on the 794 x 1123 px receipt page (px) -> converted to mm for the PDF
+const LOGO_RECT_PX = { x: 16, y: 40, w: 148, h: 120 };
+
 
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
@@ -572,6 +578,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const root = createRoot(container);
         document.body.appendChild(container);
 
+        CAPTURING_PDF = true;
         await new Promise((resolve) => {
           root.render(<ReceiptContent />);
           setTimeout(resolve, 800);
@@ -600,6 +607,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
          width: 794,
          height: 1123,
           });
+        CAPTURING_PDF = false;
         root.unmount();
         document.body.removeChild(container);
 
@@ -616,6 +624,17 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
       pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+        // Draw the logo directly on the PDF (always visible, any number of rows)
+        const mmPerPx = pdfWidth / 794;
+        pdf.addImage(
+          LOGO_BASE64,
+          "JPEG",
+          LOGO_RECT_PX.x * mmPerPx,
+          LOGO_RECT_PX.y * mmPerPx,
+          LOGO_RECT_PX.w * mmPerPx,
+          LOGO_RECT_PX.h * mmPerPx,
+        );
 
         const projectPart = (formik.values.projectType || "").replace(
           /[^a-zA-Z0-9]/g,
@@ -699,6 +718,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
         setIsGeneratingPDF(false);
       } catch (error) {
+        CAPTURING_PDF = false;
         console.error("Error generating receipt:", error);
         toast.error(`Failed to generate receipt: ${error.message}`);
         setIsGeneratingPDF(false);
@@ -846,7 +866,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     // Only the row spacing inside the two tables shrinks to make everything fit.
     const paymentRowCount = Math.max(1, getAllCheckedItems().length); // top table rows
     const particularsRowCount = adjustedItems.length + bookingAdvanceRows.length; // list rows
-    const MIDDLE_SPACE = 735; // px available between header and footer
+    const MIDDLE_SPACE = 727; // px available between header and footer
     const contentAtZeroPad =
       512 + 25 * (paymentRowCount - 1) + 18 * (particularsRowCount - 12);
     const rowPad = Math.max(
@@ -898,6 +918,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               height: "120px",
               marginBottom: "20px",
               display: "block",
+              visibility: CAPTURING_PDF ? "hidden" : "visible",
             }}
           />
         </div>
@@ -957,7 +978,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
       <div style={{ flex: 1, minHeight: 0 }}>
       {/* RECEIPT Label */}
-      <div style={{ textAlign: "center", paddingBottom: "6px" }}>
+      <div style={{ textAlign: "center", paddingBottom: "14px" }}>
         <span
           style={{
             border: "2px solid #000000",
