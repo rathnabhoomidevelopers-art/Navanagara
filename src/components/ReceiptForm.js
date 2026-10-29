@@ -11,7 +11,7 @@ const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 // and drawn directly onto the PDF page instead (so it can never go missing).
 let CAPTURING_PDF = false;
 // Logo position on the 794 x 1123 px receipt page (px) -> converted to mm for the PDF
-const LOGO_RECT_PX = { x: 16, y: 40, w: 148, h: 120 };
+const LOGO_RECT_PX = { x: 16, y: 25, w: 148, h: 120 };
 
 
 const PROJECT_TYPES = [
@@ -866,7 +866,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     // Only the row spacing inside the two tables shrinks to make everything fit.
     const paymentRowCount = Math.max(1, getAllCheckedItems().length); // top table rows
     const particularsRowCount = adjustedItems.length + bookingAdvanceRows.length; // list rows
-    const MIDDLE_SPACE = 727; // px available between header and footer
+    const MIDDLE_SPACE = 762; // px available between header and footer
     const contentAtZeroPad =
       512 + 25 * (paymentRowCount - 1) + 18 * (particularsRowCount - 12);
     const rowPad = Math.max(
@@ -880,7 +880,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       style={{
         border: "2px solid #000000",
         backgroundColor: "#ffffff",
-        padding: "20px",
+        padding: "0px 20px 20px 20px",
         fontFamily: "Arial, sans-serif",
         boxSizing: "border-box",
         height: "1115px",
@@ -894,12 +894,12 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         style={{
           display: "flex",
           alignItems: "center",
-          height: "132px",
+          height: "120px",
           flexShrink: 0,
           boxSizing: "content-box",
           borderBottom: "2px solid #000000",
-          paddingBottom: "15px",
-          paddingTop: "18px", // equal space above the logo and below the website line
+          paddingBottom: "11px",
+          paddingTop: "19px", // equal visible space above and below, logo + text share one centre line
           marginTop: "0px",
           marginBottom: "16px",
           marginLeft: "-20px",
@@ -916,13 +916,12 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             style={{
               width: "148px",
               height: "120px",
-              marginBottom: "20px",
               display: "block",
               visibility: CAPTURING_PDF ? "hidden" : "visible",
             }}
           />
         </div>
-        <div style={{ flex: 1, textAlign: "center" }}>
+        <div style={{ flex: 1, textAlign: "center", paddingBottom: "10px" }}>
           <div
             style={{
               fontSize: "18px",
