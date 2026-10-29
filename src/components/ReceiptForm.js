@@ -10,6 +10,7 @@ const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
   { name: "New City 1", code: "NCS" },
+    { name: "New City North", code: "NCL" },
 ];
 
 const defaultFormData = {
@@ -75,7 +76,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
   const [seniorityInput, setSeniorityInput] = useState("");
 
-  const ADMIN_NAMES = ["Vanita", "Sonakshi"];
+  const ADMIN_NAMES = ["Vanita", "Sonakshi", "Anitha"];
   const [createdBy, setCreatedBy] = useState(ADMIN_NAMES[0]);
 
   const [transactionIds, setTransactionIds] = useState([""]);
