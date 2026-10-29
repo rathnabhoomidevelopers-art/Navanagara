@@ -927,7 +927,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           style={{
             marginBottom: "6px",
             paddingBottom: "6px",
-            borderBottom: "1.5px solid #000",
           }}
         >
           <strong>
@@ -938,7 +937,6 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           style={{
             marginBottom: "6px",
             paddingBottom: "6px",
-            borderBottom: "1.5px solid #000",
           }}
         >
           <strong>Address: {formik.values.flatNumber}</strong>
@@ -947,12 +945,11 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           style={{
             marginBottom: "6px",
             paddingBottom: "6px",
-            borderBottom: "1.5px solid #000",
           }}
         >
           <strong>Rupees: {amountInWords} Only.</strong>
         </div>
-        <div style={{ paddingBottom: "6px", borderBottom: "1.5px solid #000" }}>
+        <div style={{ paddingBottom: "6px" }}>
           <strong>
             Seniority Number: {formik.values.projectType} (
             {formik.values.seniorityNumber})
@@ -1161,7 +1158,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                 <tr key={index}>
                   <td
                     style={{
-                      border: "1px solid #000",
+                      borderLeft: "1px solid #000",
                       padding: "8px",
                       textAlign: "center",
                       width: "5%",
@@ -1169,20 +1166,23 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   >
                     {index + 1}.
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}>
+                  <td style={{ padding: "8px" }}>
                     {item.name}
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}></td>
+                  <td style={{ borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000", padding: "8px" }}></td>
                   <td
                     style={{
-                      border: "1px solid #000",
+                      borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000",
                       padding: "8px",
-                      textAlign: "center",
+                      textAlign: "right",
                     }}
                   >
                     {hasAmount ? item.amount : "-"}
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}></td>
+                  <td style={{ borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000", padding: "8px" }}></td>
                 </tr>
               );
             })}
@@ -1196,31 +1196,34 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                 <tr key={`ba-${index}`}>
                   <td
                     style={{
-                      border: "1px solid #000",
+                      borderLeft: "1px solid #000",
                       padding: "8px",
                       textAlign: "center",
                     }}
                   >
                     {adjustedItems.length + index + 1}.
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}>
+                  <td style={{ padding: "8px" }}>
                     {bookingAdvanceRows.length > 1
                       ? `Booking Advance ${index + 1}`
                       : "Booking Advance"}
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}></td>
+                  <td style={{ borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000", padding: "8px" }}></td>
                   <td
                     style={{
-                      border: "1px solid #000",
+                      borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000",
                       padding: "8px",
-                      textAlign: "center",
+                      textAlign: "right",
                     }}
                   >
                     {displayAmount !== null && parseFloat(displayAmount) > 0
                       ? displayAmount
                       : "-"}
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "8px" }}></td>
+                  <td style={{ borderLeft: "1px solid #000",
+                      borderRight: "1px solid #000", padding: "8px" }}></td>
                 </tr>
               );
             })}
