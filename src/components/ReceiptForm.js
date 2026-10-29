@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -10,6 +11,9 @@ const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
 // While the receipt is being captured for the PDF, the logo is hidden in the capture
 // and drawn directly onto the PDF page instead (so it can never go missing).
 let CAPTURING_PDF = false;
+// Extra tightening used only while capturing, if the real layout does not fit on one page
+let ROW_PAD_REDUCTION = 0;
+let COMPACT_LEVEL = 0;
 
 // html2canvas draws every line of text a few pixels lower than the browser does.
 // While capturing for the PDF we lift all text by that amount (on the temporary clone only,
@@ -620,6 +624,31 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         );
         await new Promise((resolve) => setTimeout(resolve, 200));
 
+        // <fit-loop> Measure the REAL layout. If the note would touch the signatures, tighten
+        // the rows a little and measure again, until the note, Total and signature space all fit.
+        const MIN_SIGN_GAP = 40; // px of free space kept above the signatures
+        const signGap = () => {
+          const noteEl = container.querySelector('[data-pdf="note"]');
+          const footEl = container.querySelector('[data-pdf="footer"]');
+          if (!noteEl || !footEl) return MIN_SIGN_GAP;
+          return (
+            footEl.getBoundingClientRect().top - noteEl.getBoundingClientRect().bottom
+          );
+        };
+        ROW_PAD_REDUCTION = 0;
+        COMPACT_LEVEL = 0;
+        for (let i = 0; i < 30 && signGap() < MIN_SIGN_GAP; i++) {
+          if (ROW_PAD_REDUCTION < 16) {
+            ROW_PAD_REDUCTION += 1;
+          } else if (!COMPACT_LEVEL) {
+            COMPACT_LEVEL = 1;
+          } else {
+            break;
+          }
+          flushSync(() => root.render(<ReceiptContent />));
+        }
+        // </fit-loop>
+
        const canvas = await html2canvas(container, {
           scale: 4,
           useCORS: true,
@@ -632,6 +661,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
            liftTextForPdf(clonedDoc, clonedDoc.getElementById("receipt-pdf-capture")),
           });
         CAPTURING_PDF = false;
+        ROW_PAD_REDUCTION = 0;
+        COMPACT_LEVEL = 0;
         root.unmount();
         document.body.removeChild(container);
 
@@ -743,6 +774,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         setIsGeneratingPDF(false);
       } catch (error) {
         CAPTURING_PDF = false;
+        ROW_PAD_REDUCTION = 0;
+        COMPACT_LEVEL = 0;
         console.error("Error generating receipt:", error);
         toast.error(`Failed to generate receipt: ${error.message}`);
         setIsGeneratingPDF(false);
@@ -890,13 +923,16 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     // Only the row spacing inside the two tables shrinks to make everything fit.
     const paymentRowCount = Math.max(1, getAllCheckedItems().length); // top table rows
     const particularsRowCount = adjustedItems.length + bookingAdvanceRows.length; // list rows
-    const MIDDLE_SPACE = 800; // px available between header and footer
+    const MIDDLE_SPACE = 842; // px available between header and footer
     const contentAtZeroPad =
       512 + 25 * (paymentRowCount - 1) + 18 * (particularsRowCount - 12);
     const rowPad = Math.max(
-      2,
-      Math.min(16, Math.floor((MIDDLE_SPACE - contentAtZeroPad) / (particularsRowCount + 1))),
+      0,
+      Math.min(16, Math.floor((MIDDLE_SPACE - contentAtZeroPad) / (particularsRowCount + 1))) -
+        ROW_PAD_REDUCTION,
     );
+    const t1Pad = COMPACT_LEVEL ? "3px 6px" : "6px"; // payment table cells
+    const rcvGap = COMPACT_LEVEL ? "2px" : "6px"; // spacing in the Received From block
     const padTop = Math.floor(rowPad / 2);
     const particularsPad = `${padTop}px 8px ${rowPad - padTop}px`;
     return (
@@ -1036,8 +1072,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       <div style={{ fontSize: "13px", marginBottom: "16px" }}>
         <div
           style={{
-            marginBottom: "6px",
-            paddingBottom: "6px",
+            marginBottom: rcvGap,
+            paddingBottom: rcvGap,
           }}
         >
           <strong>
@@ -1046,21 +1082,21 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         </div>
         <div
           style={{
-            marginBottom: "6px",
-            paddingBottom: "6px",
+            marginBottom: rcvGap,
+            paddingBottom: rcvGap,
           }}
         >
           <strong>Address: {formik.values.flatNumber}</strong>
         </div>
         <div
           style={{
-            marginBottom: "6px",
-            paddingBottom: "6px",
+            marginBottom: rcvGap,
+            paddingBottom: rcvGap,
           }}
         >
           <strong>Rupees: {amountInWords} Only.</strong>
         </div>
-        <div style={{ paddingBottom: "6px" }}>
+        <div style={{ paddingBottom: rcvGap }}>
           <strong>
             Seniority Number: {formik.values.projectType} (
             {formik.values.seniorityNumber})
@@ -1094,7 +1130,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   key={i}
                   style={{
                     border: "1px solid #000000",
-                    padding: "6px",
+                    padding: t1Pad,
                     textAlign: "center",
                     fontWeight: "bold",
                     fontSize: "12px",
@@ -1115,7 +1151,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1125,7 +1161,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1135,7 +1171,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1145,7 +1181,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1155,7 +1191,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1165,7 +1201,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1175,7 +1211,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1185,7 +1221,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: t1Pad,
                       textAlign: "right",
                       fontSize: "11px",
                     }}
@@ -1363,25 +1399,24 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         </table>
       </div>
 
-      </div>
-
-      {/* Footer (fixed at bottom) */}
-      <div style={{ flexShrink: 0 }}>
-      {/* Note */}
+      {/* Note — sits directly under the Total */}
       <div
-        style={{ fontSize: "11px", fontStyle: "italic", marginBottom: "32px" }}
+        data-pdf="note"
+        style={{ fontSize: "11px", fontStyle: "italic", marginTop: "4px" }}
       >
         *If 30% of the booking amount is not paid within 20 days from the date
         of booking, 10% penalty apply.
       </div>
+      </div>
 
-      {/* Signatures */}
+      {/* Footer: signatures, fixed at the bottom of the page with free space above to sign */}
+      <div data-pdf="footer" style={{ flexShrink: 0 }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           fontSize: "13px",
-          marginTop: "56px",
+          marginTop: "0px",
           marginBottom: "12px",
           paddingBottom: "12px",
         }}
