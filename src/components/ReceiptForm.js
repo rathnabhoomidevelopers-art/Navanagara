@@ -565,7 +565,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
         const container = document.createElement("div");
        container.style.cssText =
-  "position:fixed;left:-9999px;top:0;width:786px;background:#fff;padding:4px 4px 16px 4px;margin:4px;box-sizing:border-box;";
+  "position:fixed;left:-9999px;top:0;width:794px;height:1123px;background:#fff;padding:4px;margin:0;box-sizing:border-box;";
         const { createRoot } = await import("react-dom/client");
         const root = createRoot(container);
         document.body.appendChild(container);
@@ -582,8 +582,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           logging: false,
          backgroundColor: "#ffffff",
          width: 794,
-           x: -4,   // ← ADD THIS
-           y: -4,   // ← ADD THIS
+         height: 1123,
           });
         root.unmount();
         document.body.removeChild(container);
@@ -600,7 +599,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         const imgWidth = pdfWidth;
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, "PNG", 1, 1, pdfWidth - 2, pdfHeight - 2);
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
         const projectPart = (formik.values.projectType || "").replace(
           /[^a-zA-Z0-9]/g,
@@ -798,13 +797,26 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
     return [...items, ...advanceItems];
   };
 
-  const ReceiptContent = () => (
+  const ReceiptContent = () => {
+    // Rows in the payment table push the page taller; shrink the particulars
+    // rows (never the header/footer) so everything always fits one A4 page.
+    const paymentRowCount = getAllCheckedItems().length;
+    const rowPad =
+      paymentRowCount <= 3 ? 16 : paymentRowCount === 4 ? 12 : paymentRowCount === 5 ? 8 : paymentRowCount <= 7 ? 6 : 4;
+    const padTop = Math.round(rowPad * 0.3);
+    const particularsPad = `${padTop}px 8px ${rowPad - padTop}px`;
+    return (
     <div
       style={{
         border: "2px solid #000000",
         backgroundColor: "#ffffff",
         padding: "20px",
         fontFamily: "Arial, sans-serif",
+        boxSizing: "border-box",
+        height: "1115px",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
       {/* Header with Logo */}
@@ -813,6 +825,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           display: "flex",
           alignItems: "center",
           height: "150px",
+          flexShrink: 0,
+          boxSizing: "content-box",
           borderBottom: "2px solid #000000",
           paddingBottom: "15px",
           paddingTop: "0x",
@@ -891,6 +905,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         <div style={{ width: "80px", flexShrink: 0 }}></div>
       </div>
 
+      <div style={{ flex: 1, minHeight: 0 }}>
       {/* RECEIPT Label */}
       <div style={{ textAlign: "center", paddingBottom: "6px" }}>
         <span
@@ -1105,7 +1120,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                 colSpan="2"
                 style={{
                   border: "1px solid #000000",
-                  padding: "5px 8px 11px",
+                  padding: particularsPad,
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "70%",
@@ -1117,7 +1132,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "5px 8px 11px",
+                  padding: particularsPad,
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "5%",
@@ -1129,7 +1144,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "5px 8px 11px",
+                  padding: particularsPad,
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "20%",
@@ -1141,7 +1156,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "5px 8px 11px",
+                  padding: particularsPad,
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "5%",
@@ -1160,30 +1175,30 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       borderLeft: "1px solid #000",
-                      padding: "5px 8px 11px",
+                      padding: particularsPad,
                       textAlign: "center",
                       width: "5%",
                     }}
                   >
                     {index + 1}.
                   </td>
-                  <td style={{ padding: "5px 8px 11px" }}>
+                  <td style={{ padding: particularsPad }}>
                     {item.name}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
+                      borderRight: "1px solid #000", padding: particularsPad }}></td>
                   <td
                     style={{
                       borderLeft: "1px solid #000",
                       borderRight: "1px solid #000",
-                      padding: "5px 8px 11px",
+                      padding: particularsPad,
                       textAlign: "right",
                     }}
                   >
                     {hasAmount ? item.amount : "-"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
+                      borderRight: "1px solid #000", padding: particularsPad }}></td>
                 </tr>
               );
             })}
@@ -1198,24 +1213,24 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       borderLeft: "1px solid #000",
-                      padding: "5px 8px 11px",
+                      padding: particularsPad,
                       textAlign: "center",
                     }}
                   >
                     {adjustedItems.length + index + 1}.
                   </td>
-                  <td style={{ padding: "5px 8px 11px" }}>
+                  <td style={{ padding: particularsPad }}>
                     {bookingAdvanceRows.length > 1
                       ? `Booking Advance ${index + 1}`
                       : "Booking Advance"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
+                      borderRight: "1px solid #000", padding: particularsPad }}></td>
                   <td
                     style={{
                       borderLeft: "1px solid #000",
                       borderRight: "1px solid #000",
-                      padding: "5px 8px 11px",
+                      padding: particularsPad,
                       textAlign: "right",
                     }}
                   >
@@ -1224,7 +1239,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       : "-"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
+                      borderRight: "1px solid #000", padding: particularsPad }}></td>
                 </tr>
               );
             })}
@@ -1233,26 +1248,30 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             <tr style={{ fontWeight: "bold" }}>
               <td
                 colSpan="2"
-                style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}
+                style={{ border: "1px solid #000000", padding: particularsPad }}
               >
                 <strong>Total</strong>
               </td>
-              <td style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}></td>
+              <td style={{ border: "1px solid #000000", padding: particularsPad }}></td>
               <td
                 style={{
                   border: "1px solid #000000",
-                  padding: "5px 8px 11px",
+                  padding: particularsPad,
                   textAlign: "center",
                 }}
               >
                 <strong>{adjustedTotal}</strong>
               </td>
-              <td style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}></td>
+              <td style={{ border: "1px solid #000000", padding: particularsPad }}></td>
             </tr>
           </tbody>
         </table>
       </div>
 
+      </div>
+
+      {/* Footer (fixed at bottom) */}
+      <div style={{ flexShrink: 0 }}>
       {/* Note */}
       <div
         style={{ fontSize: "11px", fontStyle: "italic", marginBottom: "32px" }}
@@ -1275,8 +1294,10 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         <div>Party's Signature</div>
         <div>President/Secretary</div>
       </div>
+      </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white">
