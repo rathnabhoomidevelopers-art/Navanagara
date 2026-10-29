@@ -29,6 +29,7 @@ export function SiteBookingForm() {
   const projects = [
     { name: "New City", code: "NCG" },
     { name: "New City 1", code: "NCS" },
+    { name: "New City North", code: "NCL" },
   ];
 
   const formik = useFormik({
