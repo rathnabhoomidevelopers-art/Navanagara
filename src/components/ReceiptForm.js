@@ -565,7 +565,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
 
         const container = document.createElement("div");
        container.style.cssText =
-  "position:fixed;left:-9999px;top:0;width:786px;background:#fff;padding:4px;margin:4px;box-sizing:border-box;";
+  "position:fixed;left:-9999px;top:0;width:786px;background:#fff;padding:4px 4px 16px 4px;margin:4px;box-sizing:border-box;";
         const { createRoot } = await import("react-dom/client");
         const root = createRoot(container);
         document.body.appendChild(container);
@@ -984,7 +984,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   key={i}
                   style={{
                     border: "1px solid #000000",
-                    padding: "6px",
+                    padding: "3px 6px 9px",
                     textAlign: "center",
                     fontWeight: "bold",
                     fontSize: "12px",
@@ -1005,7 +1005,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1015,7 +1015,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1025,7 +1025,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1035,7 +1035,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1045,7 +1045,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1055,7 +1055,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1065,7 +1065,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "center",
                       fontSize: "11px",
                     }}
@@ -1075,7 +1075,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       border: "1px solid #000000",
-                      padding: "6px",
+                      padding: "3px 6px 9px",
                       textAlign: "right",
                       fontSize: "11px",
                     }}
@@ -1105,7 +1105,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                 colSpan="2"
                 style={{
                   border: "1px solid #000000",
-                  padding: "8px",
+                  padding: "5px 8px 11px",
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "70%",
@@ -1117,7 +1117,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "8px",
+                  padding: "5px 8px 11px",
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "5%",
@@ -1129,7 +1129,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "8px",
+                  padding: "5px 8px 11px",
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "20%",
@@ -1141,7 +1141,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
               <th
                 style={{
                   border: "1px solid #000000",
-                  padding: "8px",
+                  padding: "5px 8px 11px",
                   textAlign: "center",
                   fontWeight: "bold",
                   width: "5%",
@@ -1160,30 +1160,30 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       borderLeft: "1px solid #000",
-                      padding: "8px",
+                      padding: "5px 8px 11px",
                       textAlign: "center",
                       width: "5%",
                     }}
                   >
                     {index + 1}.
                   </td>
-                  <td style={{ padding: "8px" }}>
+                  <td style={{ padding: "5px 8px 11px" }}>
                     {item.name}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "8px" }}></td>
+                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
                   <td
                     style={{
                       borderLeft: "1px solid #000",
                       borderRight: "1px solid #000",
-                      padding: "8px",
+                      padding: "5px 8px 11px",
                       textAlign: "right",
                     }}
                   >
                     {hasAmount ? item.amount : "-"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "8px" }}></td>
+                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
                 </tr>
               );
             })}
@@ -1198,24 +1198,24 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                   <td
                     style={{
                       borderLeft: "1px solid #000",
-                      padding: "8px",
+                      padding: "5px 8px 11px",
                       textAlign: "center",
                     }}
                   >
                     {adjustedItems.length + index + 1}.
                   </td>
-                  <td style={{ padding: "8px" }}>
+                  <td style={{ padding: "5px 8px 11px" }}>
                     {bookingAdvanceRows.length > 1
                       ? `Booking Advance ${index + 1}`
                       : "Booking Advance"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "8px" }}></td>
+                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
                   <td
                     style={{
                       borderLeft: "1px solid #000",
                       borderRight: "1px solid #000",
-                      padding: "8px",
+                      padding: "5px 8px 11px",
                       textAlign: "right",
                     }}
                   >
@@ -1224,7 +1224,7 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
                       : "-"}
                   </td>
                   <td style={{ borderLeft: "1px solid #000",
-                      borderRight: "1px solid #000", padding: "8px" }}></td>
+                      borderRight: "1px solid #000", padding: "5px 8px 11px" }}></td>
                 </tr>
               );
             })}
@@ -1233,21 +1233,21 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
             <tr style={{ fontWeight: "bold" }}>
               <td
                 colSpan="2"
-                style={{ border: "1px solid #000000", padding: "8px" }}
+                style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}
               >
                 <strong>Total</strong>
               </td>
-              <td style={{ border: "1px solid #000000", padding: "8px" }}></td>
+              <td style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}></td>
               <td
                 style={{
                   border: "1px solid #000000",
-                  padding: "8px",
+                  padding: "5px 8px 11px",
                   textAlign: "center",
                 }}
               >
                 <strong>{adjustedTotal}</strong>
               </td>
-              <td style={{ border: "1px solid #000000", padding: "8px" }}></td>
+              <td style={{ border: "1px solid #000000", padding: "5px 8px 11px" }}></td>
             </tr>
           </tbody>
         </table>
@@ -1267,7 +1267,9 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           display: "flex",
           justifyContent: "space-between",
           fontSize: "13px",
-          marginTop: "40px",
+          marginTop: "56px",
+          marginBottom: "12px",
+          paddingBottom: "12px",
         }}
       >
         <div>Party's Signature</div>
