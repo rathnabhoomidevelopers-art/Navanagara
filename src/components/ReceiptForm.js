@@ -4,8 +4,10 @@ import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Header } from "./Header";
+import LOGO_BASE64 from "../utils/logoData";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+
 
 const PROJECT_TYPES = [
   { name: "New City", code: "NCG" },
@@ -575,8 +577,22 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
           setTimeout(resolve, 800);
         });
 
+        // Make sure every image (logo) is fully loaded before capturing
+        await Promise.all(
+          Array.from(container.querySelectorAll("img")).map((img) =>
+            img.complete && img.naturalWidth > 0
+              ? Promise.resolve()
+              : new Promise((resolve) => {
+                  img.onload = resolve;
+                  img.onerror = resolve;
+                  setTimeout(resolve, 4000);
+                }),
+          ),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
        const canvas = await html2canvas(container, {
-          scale: 6,
+          scale: 4,
           useCORS: true,
           allowTaint: true,
           logging: false,
@@ -841,13 +857,13 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src={"/images/logo_2.webp"}
+            src={LOGO_BASE64}
             alt="Logo"
             style={{
-              width: "150px",
+              width: "148px",
               height: "120px",
               marginBottom: "20px",
-              objectFit: "contain",
+              display: "block",
             }}
           />
         </div>
