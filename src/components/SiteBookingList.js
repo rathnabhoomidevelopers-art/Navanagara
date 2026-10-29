@@ -35,6 +35,7 @@ export function SiteBookingList() {
   const projectPrefixMap = {
     "New City 1": "NCS",
     "New City": "NCG",
+    "New City North": "NCL",
   };
 
   useEffect(() => {
