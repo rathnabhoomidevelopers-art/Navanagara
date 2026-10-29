@@ -558,7 +558,8 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
       chequeNo: true,
     });
 
-    if (Object.keys(errors).length === 0 && validatePaymentItems()) {
+    const paymentItemsOk = validatePaymentItems();
+    if (Object.keys(errors).length === 0 && paymentItemsOk) {
       try {
         setIsGeneratingPDF(true);
 
@@ -694,6 +695,24 @@ const ReceiptForm = ({ initialData = {}, onReceiptGenerate = null }) => {
         setIsGeneratingPDF(false);
       }
     } else {
+      // Tell the user exactly what is blocking the PDF (previously it failed silently)
+      const problems = Object.values(errors).filter(Boolean);
+      if (!paymentItemsOk) {
+        problems.push("Select at least one payment item with an amount");
+      }
+      toast.error(
+        `❌ Cannot generate receipt. Please fix: ${problems.slice(0, 4).join(" • ")}${
+          problems.length > 4 ? ` (+${problems.length - 4} more)` : ""
+        }`,
+        { autoClose: 8000 },
+      );
+      const firstKey = Object.keys(errors)[0];
+      if (firstKey) {
+        const el = document.querySelector(`[name="${firstKey}"]`);
+        if (el && el.scrollIntoView) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
       setIsGeneratingPDF(false);
     }
   };
